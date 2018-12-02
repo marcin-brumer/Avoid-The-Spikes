@@ -126,11 +126,16 @@ Object.prototype.update = function () {
 };
 
 // Implementation
+var backgroundGradient = c.createLinearGradient(0, 0, 0, canvas.height);
+backgroundGradient.addColorStop(0, "#171e26");
+backgroundGradient.addColorStop(1, "#3f586b");
+
 function init() {}
 
 // Animation Loop
 function animate() {
-  c.clearRect(0, 0, canvas.width, canvas.height);
+  c.fillStyle = backgroundGradient;
+  c.fillRect(0, 0, canvas.width, canvas.height);
   requestAnimationFrame(animate);
 }
 
