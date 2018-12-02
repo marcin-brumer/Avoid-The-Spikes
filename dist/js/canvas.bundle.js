@@ -96,11 +96,15 @@
 "use strict";
 
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
 
 var _utils2 = _interopRequireDefault(_utils);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var canvas = document.querySelector("canvas");
 var c = canvas.getContext("2d");
@@ -117,22 +121,56 @@ addEventListener("resize", function () {
 });
 
 // Objects
-function Object() {}
 
-Object.prototype.draw = function () {};
+var Spike = function () {
+  function Spike(x, y, color) {
+    _classCallCheck(this, Spike);
 
-Object.prototype.update = function () {
-  this.draw();
-};
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.velocity = 20;
+  }
+
+  _createClass(Spike, [{
+    key: "draw",
+    value: function draw() {
+      c.save();
+      c.beginPath();
+      c.moveTo(this.x, this.y);
+      c.lineTo(this.x - 10, this.y - 50);
+      c.lineTo(this.x + 10, this.y - 50);
+      c.shadowColor = "#E3EAEF";
+      c.shadowBlur = 10;
+      c.fillStyle = this.color;
+      c.fill();
+      c.closePath();
+      c.restore();
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      this.y += this.velocity;
+      this.draw();
+    }
+  }]);
+
+  return Spike;
+}();
 
 // Implementation
+
+
 var backgroundGradient = c.createLinearGradient(0, 0, 0, canvas.height);
 backgroundGradient.addColorStop(0, "#171e26");
 backgroundGradient.addColorStop(1, "#3f586b");
 
-var groundHeight = 100;
+var spikes = [],
+    groundHeight = 100;
 
-function init() {}
+for (var i = 0; i < 1; i++) {
+  spikes.push(new Spike(canvas.width / 2, 200, "#fff"));
+}
 
 // Animation Loop
 function animate() {
@@ -143,10 +181,16 @@ function animate() {
   c.fillStyle = "#0D0909";
   c.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
+  spikes.forEach(function (spike, index) {
+    spike.update();
+    if (spike.y >= canvas.height - groundHeight) {
+      spikes.splice(index, 1);
+    }
+  });
+
   requestAnimationFrame(animate);
 }
 
-init();
 animate();
 
 /***/ }),

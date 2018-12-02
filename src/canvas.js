@@ -15,22 +15,45 @@ addEventListener("resize", () => {
 });
 
 // Objects
-function Object() {}
+class Spike {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.velocity = 20;
+  }
 
-Object.prototype.draw = function() {};
+  draw() {
+    c.save();
+    c.beginPath();
+    c.moveTo(this.x, this.y);
+    c.lineTo(this.x - 10, this.y - 50);
+    c.lineTo(this.x + 10, this.y - 50);
+    c.shadowColor = "#E3EAEF";
+    c.shadowBlur = 10;
+    c.fillStyle = this.color;
+    c.fill();
+    c.closePath();
+    c.restore();
+  }
 
-Object.prototype.update = function() {
-  this.draw();
-};
+  update() {
+    this.y += this.velocity;
+    this.draw();
+  }
+}
 
 // Implementation
 const backgroundGradient = c.createLinearGradient(0, 0, 0, canvas.height);
 backgroundGradient.addColorStop(0, "#171e26");
 backgroundGradient.addColorStop(1, "#3f586b");
 
-let groundHeight = 100;
+let spikes = [],
+  groundHeight = 100;
 
-function init() {}
+for (let i = 0; i < 1; i++) {
+  spikes.push(new Spike(canvas.width / 2, 200, "#fff"));
+}
 
 // Animation Loop
 function animate() {
@@ -41,8 +64,14 @@ function animate() {
   c.fillStyle = "#0D0909";
   c.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
+  spikes.forEach((spike, index) => {
+    spike.update();
+    if (spike.y >= canvas.height - groundHeight) {
+      spikes.splice(index, 1);
+    }
+  });
+
   requestAnimationFrame(animate);
 }
 
-init();
 animate();
