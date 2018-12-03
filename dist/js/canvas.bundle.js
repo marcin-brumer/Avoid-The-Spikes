@@ -116,8 +116,6 @@ canvas.height = innerHeight;
 addEventListener("resize", function () {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
-
-  init();
 });
 
 // Objects
@@ -160,6 +158,56 @@ var Spike = function () {
   return Spike;
 }();
 
+var Fragment = function () {
+  function Fragment(x, y, radius) {
+    _classCallCheck(this, Fragment);
+
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+
+    this.velocity = {
+      x: (Math.random() - 0.5) * 4,
+      y: 4
+    };
+    this.friction = 0.4;
+    this.gravity = 0.4;
+    this.opacity = 1;
+    this.timeToLive = 50;
+    this.color = "rgba(255,255,255," + this.opacity + ")";
+  }
+
+  _createClass(Fragment, [{
+    key: "draw",
+    value: function draw() {
+      c.beginPath();
+      c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      c.fillStyle = "rgba(255,255,255," + this.opacity + ")";
+      c.fill();
+      c.closePath();
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      if (this.y + this.velocity.y + this.radius >= canvas.height - groundHeight) {
+        this.velocity.y = -this.velocity.y * this.friction;
+        this.velocity.x *= 0.9;
+      } else {
+        this.velocity.y += this.gravity;
+      }
+
+      this.x += this.velocity.x;
+      this.y += this.velocity.y;
+      this.draw();
+
+      this.timeToLive--;
+      this.opacity -= 1 / this.timeToLive;
+    }
+  }]);
+
+  return Fragment;
+}();
+
 // Implementation
 
 
@@ -168,6 +216,7 @@ backgroundGradient.addColorStop(0, "#171e26");
 backgroundGradient.addColorStop(1, "#3f586b");
 
 var spikes = [],
+    fragments = [],
     groundHeight = 100;
 
 for (var i = 0; i < 1; i++) {
@@ -179,17 +228,32 @@ function animate() {
   // Background
   c.fillStyle = backgroundGradient;
   c.fillRect(0, 0, canvas.width, canvas.height);
+
   // Ground
   c.fillStyle = "#0D0909";
   c.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
+  // Spikes animation
   spikes.forEach(function (spike, index) {
     spike.update();
-    if (spike.y >= canvas.height - groundHeight) {
+    if (spike.y + spike.velocity >= canvas.height - groundHeight) {
       spikes.splice(index, 1);
+      for (var _i = 0; _i < 8; _i++) {
+        var radius = (Math.random() + 0.5) * 3;
+        fragments.push(new Fragment(spike.x, spike.y - radius, radius));
+      }
     }
   });
 
+  // Fragments animation
+  fragments.forEach(function (fragment, index) {
+    fragment.update();
+    if (fragment.timeToLive <= 0) {
+      fragments.splice(index, 1);
+    }
+  });
+
+  console.log(fragments);
   requestAnimationFrame(animate);
 }
 
