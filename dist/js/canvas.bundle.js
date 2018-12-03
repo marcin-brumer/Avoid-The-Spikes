@@ -123,12 +123,14 @@ addEventListener("resize", function () {
 // Objects
 
 var Spike = function () {
-  function Spike(x, y, color) {
+  function Spike() {
     _classCallCheck(this, Spike);
 
-    this.x = x;
-    this.y = y;
-    this.color = color;
+    this.x = canvas.width * Math.random();
+    this.y = 0;
+    this.width = 20;
+    this.height = 50;
+    this.color = "#fff";
     this.velocity = 20;
   }
 
@@ -138,8 +140,8 @@ var Spike = function () {
       c.save();
       c.beginPath();
       c.moveTo(this.x, this.y);
-      c.lineTo(this.x - 10, this.y - 50);
-      c.lineTo(this.x + 10, this.y - 50);
+      c.lineTo(this.x - this.width / 2, this.y - this.height);
+      c.lineTo(this.x + this.width / 2, this.y - this.height);
       c.shadowColor = "#E3EAEF";
       c.shadowBlur = 10;
       c.fillStyle = this.color;
@@ -169,7 +171,7 @@ var spikes = [],
     groundHeight = 100;
 
 for (var i = 0; i < 1; i++) {
-  spikes.push(new Spike(canvas.width / 2, 200, "#fff"));
+  spikes.push(new Spike());
 }
 
 // Animation Loop
