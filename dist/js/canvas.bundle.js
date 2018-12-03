@@ -217,11 +217,9 @@ backgroundGradient.addColorStop(1, "#3f586b");
 
 var spikes = [],
     fragments = [],
-    groundHeight = 100;
-
-for (var i = 0; i < 1; i++) {
-  spikes.push(new Spike());
-}
+    groundHeight = 100,
+    timer = 0,
+    randomSpawnRate = Math.floor(Math.random() * 25 + 60);
 
 // Animation Loop
 function animate() {
@@ -236,9 +234,9 @@ function animate() {
   // Spikes animation
   spikes.forEach(function (spike, index) {
     spike.update();
-    if (spike.y + spike.velocity >= canvas.height - groundHeight) {
+    if (spike.y >= canvas.height - groundHeight) {
       spikes.splice(index, 1);
-      for (var _i = 0; _i < 8; _i++) {
+      for (var i = 0; i < 8; i++) {
         var radius = (Math.random() + 0.5) * 3;
         fragments.push(new Fragment(spike.x, spike.y - radius, radius));
       }
@@ -253,7 +251,13 @@ function animate() {
     }
   });
 
-  console.log(fragments);
+  timer++;
+  if (timer % randomSpawnRate === 0) {
+    spikes.push(new Spike());
+    randomSpawnRate = Math.floor(Math.random() * 25 + 60);
+  }
+
+  console.log(spikes);
   requestAnimationFrame(animate);
 }
 
