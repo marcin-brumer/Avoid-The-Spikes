@@ -108,17 +108,69 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var canvas = document.querySelector("canvas");
 var c = canvas.getContext("2d");
-
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
+var rightPressed = false;
+var leftPressed = false;
+
 // Event Listeners
-addEventListener("resize", function () {
+window.addEventListener("resize", function () {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
 });
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+
+function keyDownHandler(e) {
+  if (e.keyCode == 39) {
+    rightPressed = true;
+  } else if (e.keyCode == 37) {
+    leftPressed = true;
+  }
+}
+function keyUpHandler(e) {
+  if (e.keyCode == 39) {
+    rightPressed = false;
+  } else if (e.keyCode == 37) {
+    leftPressed = false;
+  }
+}
 
 // Objects
+
+var Player = function () {
+  function Player() {
+    _classCallCheck(this, Player);
+
+    this.x = canvas.width / 2;
+    this.y = canvas.height - groundHeight - 50;
+    this.velocity = 15;
+  }
+
+  _createClass(Player, [{
+    key: "draw",
+    value: function draw() {
+      c.beginPath();
+      c.rect(this.x, this.y, 50, 50);
+      c.fillStyle = "red";
+      c.fill();
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      if (rightPressed && this.x + 50 < canvas.width) {
+        this.x += this.velocity;
+      } else if (leftPressed && this.x > 0) {
+        this.x -= this.velocity;
+      }
+      this.y = canvas.height - groundHeight - 50;
+      this.draw();
+    }
+  }]);
+
+  return Player;
+}();
 
 var Spike = function () {
   function Spike() {
@@ -221,6 +273,8 @@ var spikes = [],
     timer = 0,
     randomSpawnRate = Math.floor(Math.random() * 25 + 60);
 
+var player = new Player();
+
 // Animation Loop
 function animate() {
   // Background
@@ -230,6 +284,9 @@ function animate() {
   // Ground
   c.fillStyle = "#0D0909";
   c.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+
+  // Player animation
+  player.update();
 
   // Spikes animation
   spikes.forEach(function (spike, index) {
@@ -251,13 +308,13 @@ function animate() {
     }
   });
 
+  // Random spawn of Spikes
   timer++;
   if (timer % randomSpawnRate === 0) {
     spikes.push(new Spike());
     randomSpawnRate = Math.floor(Math.random() * 25 + 60);
   }
 
-  console.log(spikes);
   requestAnimationFrame(animate);
 }
 

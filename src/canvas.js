@@ -2,17 +2,61 @@ import utils from "./utils";
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
-
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
+let rightPressed = false;
+let leftPressed = false;
+
 // Event Listeners
-addEventListener("resize", () => {
+window.addEventListener("resize", () => {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
 });
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+
+function keyDownHandler(e) {
+  if (e.keyCode == 39) {
+    rightPressed = true;
+  } else if (e.keyCode == 37) {
+    leftPressed = true;
+  }
+}
+function keyUpHandler(e) {
+  if (e.keyCode == 39) {
+    rightPressed = false;
+  } else if (e.keyCode == 37) {
+    leftPressed = false;
+  }
+}
 
 // Objects
+class Player {
+  constructor() {
+    this.x = canvas.width / 2;
+    this.y = canvas.height - groundHeight - 50;
+    this.velocity = 15;
+  }
+
+  draw() {
+    c.beginPath();
+    c.rect(this.x, this.y, 50, 50);
+    c.fillStyle = "red";
+    c.fill();
+  }
+
+  update() {
+    if (rightPressed && this.x + 50 < canvas.width) {
+      this.x += this.velocity;
+    } else if (leftPressed && this.x > 0) {
+      this.x -= this.velocity;
+    }
+    this.y = canvas.height - groundHeight - 50;
+    this.draw();
+  }
+}
+
 class Spike {
   constructor() {
     this.x = canvas.width * Math.random();
@@ -99,6 +143,8 @@ let spikes = [],
   timer = 0,
   randomSpawnRate = Math.floor(Math.random() * 25 + 60);
 
+const player = new Player();
+
 // Animation Loop
 function animate() {
   // Background
@@ -108,6 +154,9 @@ function animate() {
   // Ground
   c.fillStyle = "#0D0909";
   c.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+
+  // Player animation
+  player.update();
 
   // Spikes animation
   spikes.forEach((spike, index) => {
