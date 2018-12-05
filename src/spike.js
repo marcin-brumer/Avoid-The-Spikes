@@ -4,7 +4,7 @@ class Spike {
   constructor() {
     this.x = canvas.width * Math.random();
     this.y = 0;
-    this.width = 20;
+    this.width = 10;
     this.height = 50;
     this.color = "#fff";
     this.velocity = 20;
@@ -14,8 +14,8 @@ class Spike {
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x - this.width / 2, this.y - this.height);
-    ctx.lineTo(this.x + this.width / 2, this.y - this.height);
+    ctx.lineTo(this.x + this.width, this.y);
+    ctx.lineTo(this.x + this.width / 2, this.y + this.height);
     ctx.shadowColor = "#E3EAEF";
     ctx.shadowBlur = 10;
     ctx.fillStyle = this.color;

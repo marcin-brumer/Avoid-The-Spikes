@@ -41,14 +41,16 @@ function keyUpHandler(e) {
 // Player object
 class Player {
   constructor() {
+    this.width = 50;
+    this.height = 50;
     this.x = canvas.width / 2;
-    this.y = canvas.height - groundHeight - 50;
+    this.y = canvas.height - groundHeight - this.height;
     this.velocity = 15;
   }
 
   draw() {
     ctx.beginPath();
-    ctx.rect(this.x, this.y, 50, 50);
+    ctx.rect(this.x, this.y, this.width, this.height);
     ctx.fillStyle = "red";
     ctx.fill();
   }
@@ -87,7 +89,21 @@ function animate() {
   // Spikes animation
   spikes.forEach((spike, index) => {
     spike.update();
+    // Collision Spike-Ground
     if (spike.y >= canvas.height - groundHeight) {
+      spikes.splice(index, 1);
+      for (let i = 0; i < 8; i++) {
+        const radius = (Math.random() + 0.5) * 3;
+        fragments.push(new Fragment(spike.x, spike.y - radius, radius));
+      }
+    }
+    // Collision Spike-Player
+    if (
+      spike.x < player.x + player.width &&
+      spike.x + spike.width > player.x &&
+      spike.y < player.y + player.height &&
+      spike.height + spike.y > player.y
+    ) {
       spikes.splice(index, 1);
       for (let i = 0; i < 8; i++) {
         const radius = (Math.random() + 0.5) * 3;

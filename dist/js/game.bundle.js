@@ -251,8 +251,10 @@ var Player = function () {
   function Player() {
     _classCallCheck(this, Player);
 
+    this.width = 50;
+    this.height = 50;
     this.x = _constants.canvas.width / 2;
-    this.y = _constants.canvas.height - _constants.groundHeight - 50;
+    this.y = _constants.canvas.height - _constants.groundHeight - this.height;
     this.velocity = 15;
   }
 
@@ -260,7 +262,7 @@ var Player = function () {
     key: "draw",
     value: function draw() {
       _constants.ctx.beginPath();
-      _constants.ctx.rect(this.x, this.y, 50, 50);
+      _constants.ctx.rect(this.x, this.y, this.width, this.height);
       _constants.ctx.fillStyle = "red";
       _constants.ctx.fill();
     }
@@ -305,11 +307,20 @@ function animate() {
   // Spikes animation
   spikes.forEach(function (spike, index) {
     spike.update();
+    // Collision Spike-Ground
     if (spike.y >= _constants.canvas.height - _constants.groundHeight) {
       spikes.splice(index, 1);
       for (var i = 0; i < 8; i++) {
         var radius = (Math.random() + 0.5) * 3;
         fragments.push(new _fragment2.default(spike.x, spike.y - radius, radius));
+      }
+    }
+    // Collision Spike-Player
+    if (spike.x < player.x + player.width && spike.x + spike.width > player.x && spike.y < player.y + player.height && spike.height + spike.y > player.y) {
+      spikes.splice(index, 1);
+      for (var _i = 0; _i < 8; _i++) {
+        var _radius = (Math.random() + 0.5) * 3;
+        fragments.push(new _fragment2.default(spike.x, spike.y - _radius, _radius));
       }
     }
   });
@@ -362,7 +373,7 @@ var Spike = function () {
 
     this.x = _constants.canvas.width * Math.random();
     this.y = 0;
-    this.width = 20;
+    this.width = 10;
     this.height = 50;
     this.color = "#fff";
     this.velocity = 20;
@@ -374,8 +385,8 @@ var Spike = function () {
       _constants.ctx.save();
       _constants.ctx.beginPath();
       _constants.ctx.moveTo(this.x, this.y);
-      _constants.ctx.lineTo(this.x - this.width / 2, this.y - this.height);
-      _constants.ctx.lineTo(this.x + this.width / 2, this.y - this.height);
+      _constants.ctx.lineTo(this.x + this.width, this.y);
+      _constants.ctx.lineTo(this.x + this.width / 2, this.y + this.height);
       _constants.ctx.shadowColor = "#E3EAEF";
       _constants.ctx.shadowBlur = 10;
       _constants.ctx.fillStyle = this.color;
