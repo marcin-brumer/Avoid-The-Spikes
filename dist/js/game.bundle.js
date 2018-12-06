@@ -215,7 +215,16 @@ var spikes = [],
     timer = 0,
     randomSpawnRate = Math.floor(Math.random() * 25 + 60),
     rightPressed = false,
-    leftPressed = false;
+    leftPressed = false,
+    state = {
+  runningLeft: false,
+  runningRight: false,
+  idleLeft: false,
+  idleRight: true
+};
+
+var sprite = new Image();
+sprite.src = "./img/sprite.png";
 
 // Fullscreeen canvas
 _constants.canvas.width = innerWidth;
@@ -232,50 +241,91 @@ document.addEventListener("keyup", keyUpHandler, false);
 // Player controls
 function keyDownHandler(e) {
   if (e.keyCode == 39) {
-    rightPressed = true;
+    state = {
+      runningLeft: false,
+      runningRight: true,
+      idleLeft: false,
+      idleRight: false
+    };
   } else if (e.keyCode == 37) {
-    leftPressed = true;
+    state = {
+      runningLeft: true,
+      runningRight: false,
+      idleLeft: false,
+      idleRight: false
+    };
   }
 }
 function keyUpHandler(e) {
   if (e.keyCode == 39) {
-    rightPressed = false;
+    state = {
+      runningLeft: false,
+      runningRight: false,
+      idleLeft: false,
+      idleRight: true
+    };
   } else if (e.keyCode == 37) {
-    leftPressed = false;
+    state = {
+      runningLeft: false,
+      runningRight: false,
+      idleLeft: true,
+      idleRight: false
+    };
   }
 }
 
 // Player object
 
 var Player = function () {
-  function Player() {
+  function Player(sprite) {
     _classCallCheck(this, Player);
 
+    this.frameWidth = 90;
+    this.frameHeight = 113.5;
     this.width = 50;
     this.height = 50;
     this.x = _constants.canvas.width / 2;
-    this.y = _constants.canvas.height - _constants.groundHeight - this.height;
+    this.y = _constants.canvas.height - _constants.groundHeight - this.frameHeight;
     this.velocity = 15;
+    this.sprite = sprite;
+    this.frameNr = 1;
+    this.runFrameCount = 20;
   }
 
   _createClass(Player, [{
-    key: "draw",
-    value: function draw() {
-      _constants.ctx.beginPath();
-      _constants.ctx.rect(this.x, this.y, this.width, this.height);
-      _constants.ctx.fillStyle = "red";
-      _constants.ctx.fill();
+    key: "runningRight",
+    value: function runningRight() {
+      if (this.frameNr > this.runFrameCount) {
+        this.frameNr = 1;
+      }
+      var frameYpos = (this.frameNr - 1) * this.frameHeight;
+      _constants.ctx.drawImage(this.sprite, 180, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.frameWidth, this.frameHeight);
+      this.frameNr++;
+    }
+  }, {
+    key: "runningLeft",
+    value: function runningLeft() {
+      if (this.frameNr > this.runFrameCount) {
+        this.frameNr = 1;
+      }
+      var frameYpos = (this.frameNr - 1) * this.frameHeight;
+      _constants.ctx.drawImage(this.sprite, 270, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.frameWidth, this.frameHeight);
+      this.frameNr++;
     }
   }, {
     key: "update",
     value: function update() {
-      if (rightPressed && this.x + 50 < _constants.canvas.width) {
-        this.x += this.velocity;
-      } else if (leftPressed && this.x > 0) {
-        this.x -= this.velocity;
+      if (state.runningRight) {
+        this.runningRight();
+        if (this.x + this.frameWidth < _constants.canvas.width) {
+          this.x += this.velocity;
+        }
+      } else if (state.runningLeft) {
+        this.runningLeft();
+        if (this.x > 0) {
+          this.x -= this.velocity;
+        }
       }
-      this.y = _constants.canvas.height - _constants.groundHeight - 50;
-      this.draw();
     }
   }]);
 
@@ -285,7 +335,7 @@ var Player = function () {
 // Player create
 
 
-var player = new Player();
+var player = new Player(sprite);
 
 // Background color
 _constants.backgroundGradient.addColorStop(0, "#171e26");

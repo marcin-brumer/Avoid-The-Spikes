@@ -8,7 +8,16 @@ let spikes = [],
   timer = 0,
   randomSpawnRate = Math.floor(Math.random() * 25 + 60),
   rightPressed = false,
-  leftPressed = false;
+  leftPressed = false,
+  state = {
+    runningLeft: false,
+    runningRight: false,
+    idleLeft: false,
+    idleRight: true
+  };
+
+const sprite = new Image();
+sprite.src = "./img/sprite.png";
 
 // Fullscreeen canvas
 canvas.width = innerWidth;
@@ -25,49 +34,109 @@ document.addEventListener("keyup", keyUpHandler, false);
 // Player controls
 function keyDownHandler(e) {
   if (e.keyCode == 39) {
-    rightPressed = true;
+    state = {
+      runningLeft: false,
+      runningRight: true,
+      idleLeft: false,
+      idleRight: false
+    };
   } else if (e.keyCode == 37) {
-    leftPressed = true;
+    state = {
+      runningLeft: true,
+      runningRight: false,
+      idleLeft: false,
+      idleRight: false
+    };
   }
 }
 function keyUpHandler(e) {
   if (e.keyCode == 39) {
-    rightPressed = false;
+    state = {
+      runningLeft: false,
+      runningRight: false,
+      idleLeft: false,
+      idleRight: true
+    };
   } else if (e.keyCode == 37) {
-    leftPressed = false;
+    state = {
+      runningLeft: false,
+      runningRight: false,
+      idleLeft: true,
+      idleRight: false
+    };
   }
 }
 
 // Player object
 class Player {
-  constructor() {
+  constructor(sprite) {
+    this.frameWidth = 90;
+    this.frameHeight = 113.5;
     this.width = 50;
     this.height = 50;
     this.x = canvas.width / 2;
-    this.y = canvas.height - groundHeight - this.height;
+    this.y = canvas.height - groundHeight - this.frameHeight;
     this.velocity = 15;
+    this.sprite = sprite;
+    this.frameNr = 1;
+    this.runFrameCount = 20;
   }
 
-  draw() {
-    ctx.beginPath();
-    ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.fillStyle = "red";
-    ctx.fill();
+  runningRight() {
+    if (this.frameNr > this.runFrameCount) {
+      this.frameNr = 1;
+    }
+    const frameYpos = (this.frameNr - 1) * this.frameHeight;
+    ctx.drawImage(
+      this.sprite,
+      180,
+      frameYpos,
+      this.frameWidth,
+      this.frameHeight,
+      this.x,
+      this.y,
+      this.frameWidth,
+      this.frameHeight
+    );
+    this.frameNr++;
+  }
+
+  runningLeft() {
+    if (this.frameNr > this.runFrameCount) {
+      this.frameNr = 1;
+    }
+    const frameYpos = (this.frameNr - 1) * this.frameHeight;
+    ctx.drawImage(
+      this.sprite,
+      270,
+      frameYpos,
+      this.frameWidth,
+      this.frameHeight,
+      this.x,
+      this.y,
+      this.frameWidth,
+      this.frameHeight
+    );
+    this.frameNr++;
   }
 
   update() {
-    if (rightPressed && this.x + 50 < canvas.width) {
-      this.x += this.velocity;
-    } else if (leftPressed && this.x > 0) {
-      this.x -= this.velocity;
+    if (state.runningRight) {
+      this.runningRight();
+      if (this.x + this.frameWidth < canvas.width) {
+        this.x += this.velocity;
+      }
+    } else if (state.runningLeft) {
+      this.runningLeft();
+      if (this.x > 0) {
+        this.x -= this.velocity;
+      }
     }
-    this.y = canvas.height - groundHeight - 50;
-    this.draw();
   }
 }
 
 // Player create
-const player = new Player();
+const player = new Player(sprite);
 
 // Background color
 backgroundGradient.addColorStop(0, "#171e26");
