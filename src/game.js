@@ -68,21 +68,18 @@ function animate() {
   ctx.fillStyle = "#0D0909";
   ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
-  // Player animation
-  player.update();
-
   // Spikes animation
   spikes.forEach((spike, index) => {
     spike.update();
     // Collision Spike-Ground
-    if (spike.y >= canvas.height - groundHeight) {
+    if (spike.y + spike.height >= canvas.height - groundHeight) {
       spikes.splice(index, 1);
       for (let i = 0; i < 8; i++) {
         const radius = (Math.random() + 0.5) * 3;
         fragments.push(
           new Fragment(
             spike.x,
-            spike.y - radius,
+            spike.y + spike.height - 2 * radius,
             radius,
             canvas,
             ctx,
@@ -104,7 +101,7 @@ function animate() {
         fragments.push(
           new Fragment(
             spike.x,
-            spike.y - radius,
+            spike.y + spike.height - 2 * radius,
             radius,
             canvas,
             ctx,
@@ -122,6 +119,9 @@ function animate() {
       fragments.splice(index, 1);
     }
   });
+
+  // Player animation
+  player.update();
 
   // Random spawn of Spikes
   timer++;

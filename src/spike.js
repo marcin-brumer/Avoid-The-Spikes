@@ -7,7 +7,7 @@ class Spike {
     this.width = 10;
     this.height = 50;
     this.color = "#fff";
-    this.velocity = 20;
+    this.velocity = 15;
   }
 
   draw() {

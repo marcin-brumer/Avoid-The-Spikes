@@ -253,18 +253,15 @@ function animate() {
   ctx.fillStyle = "#0D0909";
   ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
-  // Player animation
-  player.update();
-
   // Spikes animation
   spikes.forEach(function (spike, index) {
     spike.update();
     // Collision Spike-Ground
-    if (spike.y >= canvas.height - groundHeight) {
+    if (spike.y + spike.height >= canvas.height - groundHeight) {
       spikes.splice(index, 1);
       for (var i = 0; i < 8; i++) {
         var radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y - radius, radius, canvas, ctx, groundHeight));
+        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - 2 * radius, radius, canvas, ctx, groundHeight));
       }
     }
     // Collision Spike-Player
@@ -272,7 +269,7 @@ function animate() {
       spikes.splice(index, 1);
       for (var _i = 0; _i < 8; _i++) {
         var _radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y - _radius, _radius, canvas, ctx, groundHeight));
+        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - 2 * _radius, _radius, canvas, ctx, groundHeight));
       }
     }
   });
@@ -284,6 +281,9 @@ function animate() {
       fragments.splice(index, 1);
     }
   });
+
+  // Player animation
+  player.update();
 
   // Random spawn of Spikes
   timer++;
@@ -412,7 +412,7 @@ var Spike = function () {
     this.width = 10;
     this.height = 50;
     this.color = "#fff";
-    this.velocity = 20;
+    this.velocity = 15;
   }
 
   _createClass(Spike, [{
