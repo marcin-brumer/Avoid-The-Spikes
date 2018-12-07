@@ -213,15 +213,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var spikes = [],
     fragments = [],
     timer = 0,
-    randomSpawnRate = Math.floor(Math.random() * 25 + 60),
-    rightPressed = false,
-    leftPressed = false,
-    state = {
-  runningLeft: false,
-  runningRight: false,
-  idleLeft: false,
-  idleRight: true
-};
+    randomSpawnRate = Math.floor(Math.random() * 25 + 60);
 
 var sprite = new Image();
 sprite.src = "./img/sprite.png";
@@ -241,36 +233,24 @@ document.addEventListener("keyup", keyUpHandler, false);
 // Player controls
 function keyDownHandler(e) {
   if (e.keyCode == 39) {
-    state = {
-      runningLeft: false,
-      runningRight: true,
-      idleLeft: false,
-      idleRight: false
-    };
+    player.state.runningRight = true;
+    player.state.idleLeft = false;
+    player.state.idleRight = false;
   } else if (e.keyCode == 37) {
-    state = {
-      runningLeft: true,
-      runningRight: false,
-      idleLeft: false,
-      idleRight: false
-    };
+    player.state.runningLeft = true;
+    player.state.idleLeft = false;
+    player.state.idleRight = false;
   }
 }
 function keyUpHandler(e) {
   if (e.keyCode == 39) {
-    state = {
-      runningLeft: false,
-      runningRight: false,
-      idleLeft: false,
-      idleRight: true
-    };
+    player.state.runningRight = false;
+    player.state.idleLeft = false;
+    player.state.idleRight = true;
   } else if (e.keyCode == 37) {
-    state = {
-      runningLeft: false,
-      runningRight: false,
-      idleLeft: true,
-      idleRight: false
-    };
+    player.state.runningLeft = false;
+    player.state.idleLeft = true;
+    player.state.idleRight = false;
   }
 }
 
@@ -286,46 +266,49 @@ var Player = function () {
     this.height = 50;
     this.x = _constants.canvas.width / 2;
     this.y = _constants.canvas.height - _constants.groundHeight - this.frameHeight;
-    this.velocity = 15;
+    this.velocity = 10;
     this.sprite = sprite;
     this.frameNr = 1;
     this.runFrameCount = 20;
+    this.idleFrameCount = 16;
+    this.frameXpos = [0, 90, 180, 270];
+    this.state = {
+      runningLeft: false,
+      runningRight: false,
+      idleLeft: false,
+      idleRight: false
+    };
   }
 
   _createClass(Player, [{
-    key: "runningRight",
-    value: function runningRight() {
-      if (this.frameNr > this.runFrameCount) {
+    key: "draw",
+    value: function draw(frameXpos, frameCount) {
+      if (this.frameNr > frameCount) {
         this.frameNr = 1;
       }
       var frameYpos = (this.frameNr - 1) * this.frameHeight;
-      _constants.ctx.drawImage(this.sprite, 180, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.frameWidth, this.frameHeight);
-      this.frameNr++;
-    }
-  }, {
-    key: "runningLeft",
-    value: function runningLeft() {
-      if (this.frameNr > this.runFrameCount) {
-        this.frameNr = 1;
-      }
-      var frameYpos = (this.frameNr - 1) * this.frameHeight;
-      _constants.ctx.drawImage(this.sprite, 270, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.frameWidth, this.frameHeight);
+      _constants.ctx.drawImage(this.sprite, frameXpos, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.frameWidth, this.frameHeight);
       this.frameNr++;
     }
   }, {
     key: "update",
     value: function update() {
-      if (state.runningRight) {
-        this.runningRight();
+      if (this.state.runningRight) {
+        this.draw(this.frameXpos[2], this.runFrameCount);
         if (this.x + this.frameWidth < _constants.canvas.width) {
           this.x += this.velocity;
         }
-      } else if (state.runningLeft) {
-        this.runningLeft();
+      } else if (this.state.runningLeft) {
+        this.draw(this.frameXpos[3], this.runFrameCount);
         if (this.x > 0) {
           this.x -= this.velocity;
         }
+      } else if (this.state.idleLeft) {
+        this.draw(this.frameXpos[1], this.idleFrameCount);
+      } else {
+        this.draw(this.frameXpos[0], this.idleFrameCount);
       }
+      this.y = _constants.canvas.height - _constants.groundHeight - this.frameHeight;
     }
   }]);
 
@@ -366,7 +349,7 @@ function animate() {
       }
     }
     // Collision Spike-Player
-    if (spike.x < player.x + player.width && spike.x + spike.width > player.x && spike.y < player.y + player.height && spike.height + spike.y > player.y) {
+    if (spike.x < player.x + player.frameWidth && spike.x + spike.width > player.x && spike.y < player.y + player.frameHeight && spike.height + spike.y > player.y) {
       spikes.splice(index, 1);
       for (var _i = 0; _i < 8; _i++) {
         var _radius = (Math.random() + 0.5) * 3;
