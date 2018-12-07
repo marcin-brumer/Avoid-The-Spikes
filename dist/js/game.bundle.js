@@ -86,26 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/constants.js":
-/*!**************************!*\
-  !*** ./src/constants.js ***!
-  \**************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var canvas = exports.canvas = document.querySelector("canvas");
-var ctx = exports.ctx = canvas.getContext("2d");
-var groundHeight = exports.groundHeight = 100;
-var backgroundGradient = exports.backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-
-/***/ }),
-
 /***/ "./src/fragment.js":
 /*!*************************!*\
   !*** ./src/fragment.js ***!
@@ -122,18 +102,18 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _constants = __webpack_require__(/*! ./constants */ "./src/constants.js");
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Fragment = function () {
-  function Fragment(x, y, radius) {
+  function Fragment(x, y, radius, canvas, ctx, groundHeight) {
     _classCallCheck(this, Fragment);
 
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.groundHeight = groundHeight;
     this.x = x;
     this.y = y;
     this.radius = radius;
-
     this.velocity = {
       x: (Math.random() - 0.5) * 4,
       y: 4
@@ -148,16 +128,16 @@ var Fragment = function () {
   _createClass(Fragment, [{
     key: "draw",
     value: function draw() {
-      _constants.ctx.beginPath();
-      _constants.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-      _constants.ctx.fillStyle = "rgba(255,255,255," + this.opacity + ")";
-      _constants.ctx.fill();
-      _constants.ctx.closePath();
+      this.ctx.beginPath();
+      this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      this.ctx.fillStyle = "rgba(255,255,255," + this.opacity + ")";
+      this.ctx.fill();
+      this.ctx.closePath();
     }
   }, {
     key: "update",
     value: function update() {
-      if (this.y + this.velocity.y + this.radius >= _constants.canvas.height - _constants.groundHeight) {
+      if (this.y + this.velocity.y + this.radius >= this.canvas.height - this.groundHeight) {
         this.velocity.y = -this.velocity.y * this.friction;
         this.velocity.x *= 0.9;
       } else {
@@ -190,13 +170,9 @@ exports.default = Fragment;
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
 
 var _utils2 = _interopRequireDefault(_utils);
-
-var _constants = __webpack_require__(/*! ./constants */ "./src/constants.js");
 
 var _fragment = __webpack_require__(/*! ./fragment */ "./src/fragment.js");
 
@@ -206,26 +182,32 @@ var _spike = __webpack_require__(/*! ./spike */ "./src/spike.js");
 
 var _spike2 = _interopRequireDefault(_spike);
 
+var _player = __webpack_require__(/*! ./player */ "./src/player.js");
+
+var _player2 = _interopRequireDefault(_player);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var spikes = [],
-    fragments = [],
-    timer = 0,
-    randomSpawnRate = Math.floor(Math.random() * 25 + 60);
-
+var canvas = document.querySelector("canvas");
+var ctx = canvas.getContext("2d");
+var groundHeight = 100;
+var backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
 var sprite = new Image();
 sprite.src = "./img/sprite.png";
 
+var spikes = [];
+var fragments = [];
+var timer = 0;
+var randomSpawnRate = Math.floor(Math.random() * 25 + 60);
+
 // Fullscreeen canvas
-_constants.canvas.width = innerWidth;
-_constants.canvas.height = innerHeight;
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 
 // Event Listeners
 window.addEventListener("resize", function () {
-  _constants.canvas.width = innerWidth;
-  _constants.canvas.height = innerHeight;
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
 });
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
@@ -254,20 +236,101 @@ function keyUpHandler(e) {
   }
 }
 
-// Player object
+// Player create
+var player = new _player2.default(sprite, canvas, ctx, groundHeight);
 
+// Background color
+backgroundGradient.addColorStop(0, "#171e26");
+backgroundGradient.addColorStop(1, "#3f586b");
+
+// Animation Loop
+function animate() {
+  // Background
+  ctx.fillStyle = backgroundGradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Ground
+  ctx.fillStyle = "#0D0909";
+  ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+
+  // Player animation
+  player.update();
+
+  // Spikes animation
+  spikes.forEach(function (spike, index) {
+    spike.update();
+    // Collision Spike-Ground
+    if (spike.y >= canvas.height - groundHeight) {
+      spikes.splice(index, 1);
+      for (var i = 0; i < 8; i++) {
+        var radius = (Math.random() + 0.5) * 3;
+        fragments.push(new _fragment2.default(spike.x, spike.y - radius, radius, canvas, ctx, groundHeight));
+      }
+    }
+    // Collision Spike-Player
+    if (spike.x < player.x + player.frameWidth && spike.x + spike.width > player.x && spike.y < player.y + player.frameHeight && spike.height + spike.y > player.y) {
+      spikes.splice(index, 1);
+      for (var _i = 0; _i < 8; _i++) {
+        var _radius = (Math.random() + 0.5) * 3;
+        fragments.push(new _fragment2.default(spike.x, spike.y - _radius, _radius, canvas, ctx, groundHeight));
+      }
+    }
+  });
+
+  // Fragments animation
+  fragments.forEach(function (fragment, index) {
+    fragment.update();
+    if (fragment.timeToLive <= 0) {
+      fragments.splice(index, 1);
+    }
+  });
+
+  // Random spawn of Spikes
+  timer++;
+  if (timer % randomSpawnRate === 0) {
+    spikes.push(new _spike2.default(canvas, ctx));
+    randomSpawnRate = Math.floor(Math.random() * 25 + 60);
+  }
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+/***/ }),
+
+/***/ "./src/player.js":
+/*!***********************!*\
+  !*** ./src/player.js ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// Player object
 var Player = function () {
-  function Player(sprite) {
+  function Player(sprite, canvas, ctx, groundHeight) {
     _classCallCheck(this, Player);
 
     this.frameWidth = 90;
     this.frameHeight = 113.5;
-    this.width = 50;
-    this.height = 50;
-    this.x = _constants.canvas.width / 2;
-    this.y = _constants.canvas.height - _constants.groundHeight - this.frameHeight;
+    this.x = canvas.width / 2;
+    this.y = canvas.height - groundHeight - this.frameHeight;
     this.velocity = 10;
     this.sprite = sprite;
+    this.ctx = ctx;
+    this.canvas = canvas;
+    this.groundHeight = groundHeight;
     this.frameNr = 1;
     this.runFrameCount = 20;
     this.idleFrameCount = 16;
@@ -287,7 +350,7 @@ var Player = function () {
         this.frameNr = 1;
       }
       var frameYpos = (this.frameNr - 1) * this.frameHeight;
-      _constants.ctx.drawImage(this.sprite, frameXpos, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.frameWidth, this.frameHeight);
+      this.ctx.drawImage(this.sprite, frameXpos, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.frameWidth, this.frameHeight);
       this.frameNr++;
     }
   }, {
@@ -295,7 +358,7 @@ var Player = function () {
     value: function update() {
       if (this.state.runningRight) {
         this.draw(this.frameXpos[2], this.runFrameCount);
-        if (this.x + this.frameWidth < _constants.canvas.width) {
+        if (this.x + this.frameWidth < this.canvas.width) {
           this.x += this.velocity;
         }
       } else if (this.state.runningLeft) {
@@ -308,75 +371,15 @@ var Player = function () {
       } else {
         this.draw(this.frameXpos[0], this.idleFrameCount);
       }
-      this.y = _constants.canvas.height - _constants.groundHeight - this.frameHeight;
+      // Keeps player Y position when screen is resized
+      this.y = this.canvas.height - this.groundHeight - this.frameHeight;
     }
   }]);
 
   return Player;
 }();
 
-// Player create
-
-
-var player = new Player(sprite);
-
-// Background color
-_constants.backgroundGradient.addColorStop(0, "#171e26");
-_constants.backgroundGradient.addColorStop(1, "#3f586b");
-
-// Animation Loop
-function animate() {
-  // Background
-  _constants.ctx.fillStyle = _constants.backgroundGradient;
-  _constants.ctx.fillRect(0, 0, _constants.canvas.width, _constants.canvas.height);
-
-  // Ground
-  _constants.ctx.fillStyle = "#0D0909";
-  _constants.ctx.fillRect(0, _constants.canvas.height - _constants.groundHeight, _constants.canvas.width, _constants.groundHeight);
-
-  // Player animation
-  player.update();
-
-  // Spikes animation
-  spikes.forEach(function (spike, index) {
-    spike.update();
-    // Collision Spike-Ground
-    if (spike.y >= _constants.canvas.height - _constants.groundHeight) {
-      spikes.splice(index, 1);
-      for (var i = 0; i < 8; i++) {
-        var radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y - radius, radius));
-      }
-    }
-    // Collision Spike-Player
-    if (spike.x < player.x + player.frameWidth && spike.x + spike.width > player.x && spike.y < player.y + player.frameHeight && spike.height + spike.y > player.y) {
-      spikes.splice(index, 1);
-      for (var _i = 0; _i < 8; _i++) {
-        var _radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y - _radius, _radius));
-      }
-    }
-  });
-
-  // Fragments animation
-  fragments.forEach(function (fragment, index) {
-    fragment.update();
-    if (fragment.timeToLive <= 0) {
-      fragments.splice(index, 1);
-    }
-  });
-
-  // Random spawn of Spikes
-  timer++;
-  if (timer % randomSpawnRate === 0) {
-    spikes.push(new _spike2.default());
-    randomSpawnRate = Math.floor(Math.random() * 25 + 60);
-  }
-
-  requestAnimationFrame(animate);
-}
-
-animate();
+exports.default = Player;
 
 /***/ }),
 
@@ -396,15 +399,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _constants = __webpack_require__(/*! ./constants */ "./src/constants.js");
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Spike = function () {
-  function Spike() {
+  function Spike(canvas, ctx) {
     _classCallCheck(this, Spike);
 
-    this.x = _constants.canvas.width * Math.random();
+    this.ctx = ctx;
+    this.canvas = canvas;
+    this.x = this.canvas.width * Math.random();
     this.y = 0;
     this.width = 10;
     this.height = 50;
@@ -415,17 +418,17 @@ var Spike = function () {
   _createClass(Spike, [{
     key: "draw",
     value: function draw() {
-      _constants.ctx.save();
-      _constants.ctx.beginPath();
-      _constants.ctx.moveTo(this.x, this.y);
-      _constants.ctx.lineTo(this.x + this.width, this.y);
-      _constants.ctx.lineTo(this.x + this.width / 2, this.y + this.height);
-      _constants.ctx.shadowColor = "#E3EAEF";
-      _constants.ctx.shadowBlur = 10;
-      _constants.ctx.fillStyle = this.color;
-      _constants.ctx.fill();
-      _constants.ctx.closePath();
-      _constants.ctx.restore();
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.x, this.y);
+      this.ctx.lineTo(this.x + this.width, this.y);
+      this.ctx.lineTo(this.x + this.width / 2, this.y + this.height);
+      this.ctx.shadowColor = "#E3EAEF";
+      this.ctx.shadowBlur = 10;
+      this.ctx.fillStyle = this.color;
+      this.ctx.fill();
+      this.ctx.closePath();
+      this.ctx.restore();
     }
   }, {
     key: "update",

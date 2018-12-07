@@ -1,15 +1,19 @@
 import utils from "./utils";
-import { canvas, ctx, groundHeight, backgroundGradient } from "./constants";
 import Fragment from "./fragment";
 import Spike from "./spike";
+import Player from "./player";
 
-let spikes = [],
-  fragments = [],
-  timer = 0,
-  randomSpawnRate = Math.floor(Math.random() * 25 + 60);
-
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+const groundHeight = 100;
+const backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
 const sprite = new Image();
 sprite.src = "./img/sprite.png";
+
+let spikes = [];
+let fragments = [];
+let timer = 0;
+let randomSpawnRate = Math.floor(Math.random() * 25 + 60);
 
 // Fullscreeen canvas
 canvas.width = innerWidth;
@@ -47,70 +51,8 @@ function keyUpHandler(e) {
   }
 }
 
-// Player object
-class Player {
-  constructor(sprite) {
-    this.frameWidth = 90;
-    this.frameHeight = 113.5;
-    this.width = 50;
-    this.height = 50;
-    this.x = canvas.width / 2;
-    this.y = canvas.height - groundHeight - this.frameHeight;
-    this.velocity = 10;
-    this.sprite = sprite;
-    this.frameNr = 1;
-    this.runFrameCount = 20;
-    this.idleFrameCount = 16;
-    this.frameXpos = [0, 90, 180, 270];
-    this.state = {
-      runningLeft: false,
-      runningRight: false,
-      idleLeft: false,
-      idleRight: false
-    };
-  }
-
-  draw(frameXpos, frameCount) {
-    if (this.frameNr > frameCount) {
-      this.frameNr = 1;
-    }
-    const frameYpos = (this.frameNr - 1) * this.frameHeight;
-    ctx.drawImage(
-      this.sprite,
-      frameXpos,
-      frameYpos,
-      this.frameWidth,
-      this.frameHeight,
-      this.x,
-      this.y,
-      this.frameWidth,
-      this.frameHeight
-    );
-    this.frameNr++;
-  }
-
-  update() {
-    if (this.state.runningRight) {
-      this.draw(this.frameXpos[2], this.runFrameCount);
-      if (this.x + this.frameWidth < canvas.width) {
-        this.x += this.velocity;
-      }
-    } else if (this.state.runningLeft) {
-      this.draw(this.frameXpos[3], this.runFrameCount);
-      if (this.x > 0) {
-        this.x -= this.velocity;
-      }
-    } else if (this.state.idleLeft) {
-      this.draw(this.frameXpos[1], this.idleFrameCount);
-    } else {
-      this.draw(this.frameXpos[0], this.idleFrameCount);
-    }
-    this.y = canvas.height - groundHeight - this.frameHeight;
-  }
-}
-
 // Player create
-const player = new Player(sprite);
+const player = new Player(sprite, canvas, ctx, groundHeight);
 
 // Background color
 backgroundGradient.addColorStop(0, "#171e26");
@@ -137,7 +79,16 @@ function animate() {
       spikes.splice(index, 1);
       for (let i = 0; i < 8; i++) {
         const radius = (Math.random() + 0.5) * 3;
-        fragments.push(new Fragment(spike.x, spike.y - radius, radius));
+        fragments.push(
+          new Fragment(
+            spike.x,
+            spike.y - radius,
+            radius,
+            canvas,
+            ctx,
+            groundHeight
+          )
+        );
       }
     }
     // Collision Spike-Player
@@ -150,7 +101,16 @@ function animate() {
       spikes.splice(index, 1);
       for (let i = 0; i < 8; i++) {
         const radius = (Math.random() + 0.5) * 3;
-        fragments.push(new Fragment(spike.x, spike.y - radius, radius));
+        fragments.push(
+          new Fragment(
+            spike.x,
+            spike.y - radius,
+            radius,
+            canvas,
+            ctx,
+            groundHeight
+          )
+        );
       }
     }
   });
@@ -166,7 +126,7 @@ function animate() {
   // Random spawn of Spikes
   timer++;
   if (timer % randomSpawnRate === 0) {
-    spikes.push(new Spike());
+    spikes.push(new Spike(canvas, ctx));
     randomSpawnRate = Math.floor(Math.random() * 25 + 60);
   }
 

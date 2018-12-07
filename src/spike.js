@@ -1,8 +1,8 @@
-import { canvas, ctx } from "./constants";
-
 class Spike {
-  constructor() {
-    this.x = canvas.width * Math.random();
+  constructor(canvas, ctx) {
+    this.ctx = ctx;
+    this.canvas = canvas;
+    this.x = this.canvas.width * Math.random();
     this.y = 0;
     this.width = 10;
     this.height = 50;
@@ -11,17 +11,17 @@ class Spike {
   }
 
   draw() {
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x + this.width, this.y);
-    ctx.lineTo(this.x + this.width / 2, this.y + this.height);
-    ctx.shadowColor = "#E3EAEF";
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.closePath();
-    ctx.restore();
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.x, this.y);
+    this.ctx.lineTo(this.x + this.width, this.y);
+    this.ctx.lineTo(this.x + this.width / 2, this.y + this.height);
+    this.ctx.shadowColor = "#E3EAEF";
+    this.ctx.shadowBlur = 10;
+    this.ctx.fillStyle = this.color;
+    this.ctx.fill();
+    this.ctx.closePath();
+    this.ctx.restore();
   }
 
   update() {

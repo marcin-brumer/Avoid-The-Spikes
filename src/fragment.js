@@ -1,11 +1,11 @@
-import { canvas, ctx, groundHeight } from "./constants";
-
 class Fragment {
-  constructor(x, y, radius) {
+  constructor(x, y, radius, canvas, ctx, groundHeight) {
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.groundHeight = groundHeight;
     this.x = x;
     this.y = y;
     this.radius = radius;
-
     this.velocity = {
       x: (Math.random() - 0.5) * 4,
       y: 4
@@ -18,17 +18,17 @@ class Fragment {
   }
 
   draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    ctx.fillStyle = `rgba(255,255,255,${this.opacity})`;
-    ctx.fill();
-    ctx.closePath();
+    this.ctx.beginPath();
+    this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    this.ctx.fillStyle = `rgba(255,255,255,${this.opacity})`;
+    this.ctx.fill();
+    this.ctx.closePath();
   }
 
   update() {
     if (
       this.y + this.velocity.y + this.radius >=
-      canvas.height - groundHeight
+      this.canvas.height - this.groundHeight
     ) {
       this.velocity.y = -this.velocity.y * this.friction;
       this.velocity.x *= 0.9;
