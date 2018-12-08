@@ -13,13 +13,40 @@ class Player {
     this.frameNr = 1;
     this.runFrameCount = 20;
     this.idleFrameCount = 16;
-    this.frameXpos = [0, 90, 180, 270];
+    this.deadFrameCount = 30;
+    this.frameXpos = {
+      idleRight: 0,
+      idleLeft: 90,
+      runningRight: 180,
+      runningLeft: 270,
+      dead: 360
+    };
     this.state = {
       runningLeft: false,
       runningRight: false,
       idleLeft: false,
-      idleRight: false
+      idleRight: true,
+      dead: false
     };
+  }
+
+  deathAnim() {
+    if (this.frameNr > 30) {
+      this.frameNr = 30;
+    }
+    const frameYpos = (this.frameNr - 1) * 125.5;
+    this.ctx.drawImage(
+      this.sprite,
+      this.frameXpos.dead,
+      frameYpos,
+      150,
+      125.5,
+      this.x,
+      this.y,
+      150,
+      125.5
+    );
+    this.frameNr++;
   }
 
   draw(frameXpos, frameCount) {
@@ -43,19 +70,21 @@ class Player {
 
   update() {
     if (this.state.runningRight) {
-      this.draw(this.frameXpos[2], this.runFrameCount);
+      this.draw(this.frameXpos.runningRight, this.runFrameCount);
       if (this.x + this.frameWidth < this.canvas.width) {
         this.x += this.velocity;
       }
     } else if (this.state.runningLeft) {
-      this.draw(this.frameXpos[3], this.runFrameCount);
+      this.draw(this.frameXpos.runningLeft, this.runFrameCount);
       if (this.x > 0) {
         this.x -= this.velocity;
       }
     } else if (this.state.idleLeft) {
-      this.draw(this.frameXpos[1], this.idleFrameCount);
-    } else {
-      this.draw(this.frameXpos[0], this.idleFrameCount);
+      this.draw(this.frameXpos.idleLeft, this.idleFrameCount);
+    } else if (this.state.idleRight) {
+      this.draw(this.frameXpos.idleRight, this.idleFrameCount);
+    } else if (this.state.dead) {
+      this.deathAnim();
     }
     // Keeps player Y position when screen is resized
     this.y = this.canvas.height - this.groundHeight - this.frameHeight;

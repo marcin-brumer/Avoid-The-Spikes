@@ -31,23 +31,19 @@ document.addEventListener("keyup", keyUpHandler, false);
 function keyDownHandler(e) {
   if (e.keyCode == 39) {
     player.state.runningRight = true;
-    player.state.idleLeft = false;
-    player.state.idleRight = false;
   } else if (e.keyCode == 37) {
     player.state.runningLeft = true;
-    player.state.idleLeft = false;
-    player.state.idleRight = false;
   }
 }
 function keyUpHandler(e) {
   if (e.keyCode == 39) {
     player.state.runningRight = false;
-    player.state.idleLeft = false;
     player.state.idleRight = true;
+    player.state.idleLeft = false;
   } else if (e.keyCode == 37) {
     player.state.runningLeft = false;
-    player.state.idleLeft = true;
     player.state.idleRight = false;
+    player.state.idleLeft = true;
   }
 }
 
@@ -73,13 +69,15 @@ function animate() {
     spike.update();
     // Collision Spike-Ground
     if (spike.y + spike.height >= canvas.height - groundHeight) {
+      // Destroy Spike
       spikes.splice(index, 1);
+      // Create fragments
       for (let i = 0; i < 8; i++) {
         const radius = (Math.random() + 0.5) * 3;
         fragments.push(
           new Fragment(
             spike.x,
-            spike.y + spike.height - 2 * radius,
+            spike.y + spike.height - radius,
             radius,
             canvas,
             ctx,
@@ -95,13 +93,15 @@ function animate() {
       spike.y < player.y + player.frameHeight &&
       spike.height + spike.y > player.y
     ) {
+      // Destroy Spike
       spikes.splice(index, 1);
+      // Create fragments
       for (let i = 0; i < 8; i++) {
         const radius = (Math.random() + 0.5) * 3;
         fragments.push(
           new Fragment(
             spike.x,
-            spike.y + spike.height - 2 * radius,
+            spike.y + spike.height - radius,
             radius,
             canvas,
             ctx,
@@ -109,6 +109,14 @@ function animate() {
           )
         );
       }
+      // Player death
+      player.state = {
+        runningLeft: false,
+        runningRight: false,
+        idleLeft: false,
+        idleRight: false,
+        dead: true
+      };
     }
   });
 
@@ -129,7 +137,6 @@ function animate() {
     spikes.push(new Spike(canvas, ctx));
     randomSpawnRate = Math.floor(Math.random() * 25 + 60);
   }
-
   requestAnimationFrame(animate);
 }
 

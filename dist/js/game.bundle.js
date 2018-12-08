@@ -216,23 +216,19 @@ document.addEventListener("keyup", keyUpHandler, false);
 function keyDownHandler(e) {
   if (e.keyCode == 39) {
     player.state.runningRight = true;
-    player.state.idleLeft = false;
-    player.state.idleRight = false;
   } else if (e.keyCode == 37) {
     player.state.runningLeft = true;
-    player.state.idleLeft = false;
-    player.state.idleRight = false;
   }
 }
 function keyUpHandler(e) {
   if (e.keyCode == 39) {
     player.state.runningRight = false;
-    player.state.idleLeft = false;
     player.state.idleRight = true;
+    player.state.idleLeft = false;
   } else if (e.keyCode == 37) {
     player.state.runningLeft = false;
-    player.state.idleLeft = true;
     player.state.idleRight = false;
+    player.state.idleLeft = true;
   }
 }
 
@@ -258,19 +254,31 @@ function animate() {
     spike.update();
     // Collision Spike-Ground
     if (spike.y + spike.height >= canvas.height - groundHeight) {
+      // Destroy Spike
       spikes.splice(index, 1);
+      // Create fragments
       for (var i = 0; i < 8; i++) {
         var radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - 2 * radius, radius, canvas, ctx, groundHeight));
+        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - radius, radius, canvas, ctx, groundHeight));
       }
     }
     // Collision Spike-Player
     if (spike.x < player.x + player.frameWidth && spike.x + spike.width > player.x && spike.y < player.y + player.frameHeight && spike.height + spike.y > player.y) {
+      // Destroy Spike
       spikes.splice(index, 1);
+      // Create fragments
       for (var _i = 0; _i < 8; _i++) {
         var _radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - 2 * _radius, _radius, canvas, ctx, groundHeight));
+        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _radius, _radius, canvas, ctx, groundHeight));
       }
+      // Player death
+      player.state = {
+        runningLeft: false,
+        runningRight: false,
+        idleLeft: false,
+        idleRight: false,
+        dead: true
+      };
     }
   });
 
@@ -291,7 +299,6 @@ function animate() {
     spikes.push(new _spike2.default(canvas, ctx));
     randomSpawnRate = Math.floor(Math.random() * 25 + 60);
   }
-
   requestAnimationFrame(animate);
 }
 
@@ -334,16 +341,34 @@ var Player = function () {
     this.frameNr = 1;
     this.runFrameCount = 20;
     this.idleFrameCount = 16;
-    this.frameXpos = [0, 90, 180, 270];
+    this.deadFrameCount = 30;
+    this.frameXpos = {
+      idleRight: 0,
+      idleLeft: 90,
+      runningRight: 180,
+      runningLeft: 270,
+      dead: 360
+    };
     this.state = {
       runningLeft: false,
       runningRight: false,
       idleLeft: false,
-      idleRight: false
+      idleRight: true,
+      dead: false
     };
   }
 
   _createClass(Player, [{
+    key: "deathAnim",
+    value: function deathAnim() {
+      if (this.frameNr > 30) {
+        this.frameNr = 30;
+      }
+      var frameYpos = (this.frameNr - 1) * 125.5;
+      this.ctx.drawImage(this.sprite, this.frameXpos.dead, frameYpos, 150, 125.5, this.x, this.y, 150, 125.5);
+      this.frameNr++;
+    }
+  }, {
     key: "draw",
     value: function draw(frameXpos, frameCount) {
       if (this.frameNr > frameCount) {
@@ -357,19 +382,21 @@ var Player = function () {
     key: "update",
     value: function update() {
       if (this.state.runningRight) {
-        this.draw(this.frameXpos[2], this.runFrameCount);
+        this.draw(this.frameXpos.runningRight, this.runFrameCount);
         if (this.x + this.frameWidth < this.canvas.width) {
           this.x += this.velocity;
         }
       } else if (this.state.runningLeft) {
-        this.draw(this.frameXpos[3], this.runFrameCount);
+        this.draw(this.frameXpos.runningLeft, this.runFrameCount);
         if (this.x > 0) {
           this.x -= this.velocity;
         }
       } else if (this.state.idleLeft) {
-        this.draw(this.frameXpos[1], this.idleFrameCount);
-      } else {
-        this.draw(this.frameXpos[0], this.idleFrameCount);
+        this.draw(this.frameXpos.idleLeft, this.idleFrameCount);
+      } else if (this.state.idleRight) {
+        this.draw(this.frameXpos.idleRight, this.idleFrameCount);
+      } else if (this.state.dead) {
+        this.deathAnim();
       }
       // Keeps player Y position when screen is resized
       this.y = this.canvas.height - this.groundHeight - this.frameHeight;
