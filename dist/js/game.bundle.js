@@ -186,6 +186,10 @@ var _player = __webpack_require__(/*! ./player */ "./src/player.js");
 
 var _player2 = _interopRequireDefault(_player);
 
+var _star = __webpack_require__(/*! ./star */ "./src/star.js");
+
+var _star2 = _interopRequireDefault(_star);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var canvas = document.querySelector("canvas");
@@ -197,8 +201,10 @@ sprite.src = "./img/sprite.png";
 
 var spikes = [];
 var fragments = [];
+var stars = [];
 var timer = 0;
-var randomSpawnRate = Math.floor(Math.random() * 25 + 60);
+var spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
+var starRandomSpawnRate = _utils2.default.randomIntFromRange(120, 180);
 
 // Fullscreeen canvas
 canvas.width = innerWidth;
@@ -282,6 +288,21 @@ function animate() {
     }
   });
 
+  // Stars animation
+  stars.forEach(function (star, index) {
+    star.update();
+    // Collision Star-Ground
+    if (star.y + star.radius >= canvas.height - groundHeight) {
+      // Destroy Star
+      stars.splice(index, 1);
+    }
+    // Collision Star-Player
+    if (star.x - star.radius < player.x + player.frameWidth && star.x + star.radius > player.x && star.y - star.radius < player.y + player.frameHeight && star.y + star.radius > player.y) {
+      // Destroy Star
+      stars.splice(index, 1);
+    }
+  });
+
   // Fragments animation
   fragments.forEach(function (fragment, index) {
     fragment.update();
@@ -293,12 +314,16 @@ function animate() {
   // Player animation
   player.update();
 
-  // Random spawn of Spikes
   timer++;
-  if (timer % randomSpawnRate === 0) {
+  if (timer % spikeRandomSpawnRate === 0) {
     spikes.push(new _spike2.default(canvas, ctx));
-    randomSpawnRate = Math.floor(Math.random() * 25 + 60);
+    spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
   }
+  if (timer % starRandomSpawnRate === 0) {
+    stars.push(new _star2.default(canvas, ctx));
+    starRandomSpawnRate = _utils2.default.randomIntFromRange(120, 180);
+  }
+
   requestAnimationFrame(animate);
 }
 
@@ -324,7 +349,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-// Player object
 var Player = function () {
   function Player(sprite, canvas, ctx, groundHeight) {
     _classCallCheck(this, Player);
@@ -433,8 +457,7 @@ var Spike = function () {
     _classCallCheck(this, Spike);
 
     this.ctx = ctx;
-    this.canvas = canvas;
-    this.x = this.canvas.width * Math.random();
+    this.x = canvas.width * Math.random();
     this.y = 0;
     this.width = 10;
     this.height = 50;
@@ -469,6 +492,69 @@ var Spike = function () {
 }();
 
 exports.default = Spike;
+
+/***/ }),
+
+/***/ "./src/star.js":
+/*!*********************!*\
+  !*** ./src/star.js ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Star = function () {
+  function Star(canvas, ctx) {
+    _classCallCheck(this, Star);
+
+    this.x = canvas.width * Math.random();
+    this.y = 0;
+    this.radius = 15;
+    this.velocity = 5;
+    this.ctx = ctx;
+  }
+
+  _createClass(Star, [{
+    key: "draw",
+    value: function draw() {
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.translate(this.x, this.y);
+      this.ctx.moveTo(0, 0 - this.radius);
+      for (var i = 0; i < 5; i++) {
+        this.ctx.rotate(Math.PI / 5);
+        this.ctx.lineTo(0, 0 - this.radius * 0.5);
+        this.ctx.rotate(Math.PI / 5);
+        this.ctx.lineTo(0, 0 - this.radius);
+      }
+      this.ctx.shadowColor = "#FFEA46";
+      this.ctx.shadowBlur = 10;
+      this.ctx.fillStyle = "#FFEA46";
+      this.ctx.fill();
+      this.ctx.restore();
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      this.y += this.velocity;
+      this.draw();
+    }
+  }]);
+
+  return Star;
+}();
+
+exports.default = Star;
 
 /***/ }),
 

@@ -2,6 +2,7 @@ import utils from "./utils";
 import Fragment from "./fragment";
 import Spike from "./spike";
 import Player from "./player";
+import Star from "./star";
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -12,8 +13,10 @@ sprite.src = "./img/sprite.png";
 
 let spikes = [];
 let fragments = [];
+let stars = [];
 let timer = 0;
-let randomSpawnRate = Math.floor(Math.random() * 25 + 60);
+let spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
+let starRandomSpawnRate = utils.randomIntFromRange(120, 180);
 
 // Fullscreeen canvas
 canvas.width = innerWidth;
@@ -120,6 +123,26 @@ function animate() {
     }
   });
 
+  // Stars animation
+  stars.forEach((star, index) => {
+    star.update();
+    // Collision Star-Ground
+    if (star.y + star.radius >= canvas.height - groundHeight) {
+      // Destroy Star
+      stars.splice(index, 1);
+    }
+    // Collision Star-Player
+    if (
+      star.x - star.radius < player.x + player.frameWidth &&
+      star.x + star.radius > player.x &&
+      star.y - star.radius < player.y + player.frameHeight &&
+      star.y + star.radius > player.y
+    ) {
+      // Destroy Star
+      stars.splice(index, 1);
+    }
+  });
+
   // Fragments animation
   fragments.forEach((fragment, index) => {
     fragment.update();
@@ -131,12 +154,16 @@ function animate() {
   // Player animation
   player.update();
 
-  // Random spawn of Spikes
   timer++;
-  if (timer % randomSpawnRate === 0) {
+  if (timer % spikeRandomSpawnRate === 0) {
     spikes.push(new Spike(canvas, ctx));
-    randomSpawnRate = Math.floor(Math.random() * 25 + 60);
+    spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
   }
+  if (timer % starRandomSpawnRate === 0) {
+    stars.push(new Star(canvas, ctx));
+    starRandomSpawnRate = utils.randomIntFromRange(120, 180);
+  }
+
   requestAnimationFrame(animate);
 }
 

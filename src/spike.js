@@ -1,8 +1,7 @@
 class Spike {
   constructor(canvas, ctx) {
     this.ctx = ctx;
-    this.canvas = canvas;
-    this.x = this.canvas.width * Math.random();
+    this.x = canvas.width * Math.random();
     this.y = 0;
     this.width = 10;
     this.height = 50;

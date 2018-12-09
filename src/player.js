@@ -1,4 +1,3 @@
-// Player object
 class Player {
   constructor(sprite, canvas, ctx, groundHeight) {
     this.frameWidth = 90;
