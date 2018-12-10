@@ -292,7 +292,7 @@ function animate() {
   stars.forEach(function (star, index) {
     star.update();
     // Collision Star-Ground
-    if (star.y + star.radius >= canvas.height - groundHeight) {
+    if (star.timeToLive <= 1) {
       // Destroy Star
       stars.splice(index, 1);
     }
@@ -320,10 +320,9 @@ function animate() {
     spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
   }
   if (timer % starRandomSpawnRate === 0) {
-    stars.push(new _star2.default(canvas, ctx));
-    starRandomSpawnRate = _utils2.default.randomIntFromRange(120, 180);
+    stars.push(new _star2.default(canvas, ctx, groundHeight));
+    starRandomSpawnRate = _utils2.default.randomIntFromRange(140, 280);
   }
-
   requestAnimationFrame(animate);
 }
 
@@ -514,7 +513,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Star = function () {
-  function Star(canvas, ctx) {
+  function Star(canvas, ctx, groundHeight) {
     _classCallCheck(this, Star);
 
     this.x = canvas.width * Math.random();
@@ -522,6 +521,10 @@ var Star = function () {
     this.radius = 15;
     this.velocity = 5;
     this.ctx = ctx;
+    this.opacity = 1;
+    this.timeToLive = 50;
+    this.groundHeight = groundHeight;
+    this.canvas = canvas;
   }
 
   _createClass(Star, [{
@@ -537,16 +540,22 @@ var Star = function () {
         this.ctx.rotate(Math.PI / 5);
         this.ctx.lineTo(0, 0 - this.radius);
       }
-      this.ctx.shadowColor = "#FFEA46";
+      this.ctx.shadowColor = "rgba(255, 234, 70, " + this.opacity + ")";
       this.ctx.shadowBlur = 10;
-      this.ctx.fillStyle = "#FFEA46";
+      this.ctx.fillStyle = "rgba(255, 234, 70, " + this.opacity + ")";
       this.ctx.fill();
       this.ctx.restore();
     }
   }, {
     key: "update",
     value: function update() {
-      this.y += this.velocity;
+      if (this.y + this.radius < this.canvas.height - this.groundHeight) {
+        this.y += this.velocity;
+      } else {
+        this.timeToLive--;
+        this.opacity -= 1 / this.timeToLive;
+      }
+
       this.draw();
     }
   }]);

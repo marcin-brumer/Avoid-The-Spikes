@@ -127,7 +127,7 @@ function animate() {
   stars.forEach((star, index) => {
     star.update();
     // Collision Star-Ground
-    if (star.y + star.radius >= canvas.height - groundHeight) {
+    if (star.timeToLive <= 1) {
       // Destroy Star
       stars.splice(index, 1);
     }
@@ -160,10 +160,9 @@ function animate() {
     spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
   }
   if (timer % starRandomSpawnRate === 0) {
-    stars.push(new Star(canvas, ctx));
-    starRandomSpawnRate = utils.randomIntFromRange(120, 180);
+    stars.push(new Star(canvas, ctx, groundHeight));
+    starRandomSpawnRate = utils.randomIntFromRange(140, 280);
   }
-
   requestAnimationFrame(animate);
 }
 
