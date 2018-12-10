@@ -15,6 +15,7 @@ let spikes = [];
 let fragments = [];
 let stars = [];
 let timer = 0;
+let score = 0;
 let spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
 let starRandomSpawnRate = utils.randomIntFromRange(120, 180);
 
@@ -48,6 +49,13 @@ function keyUpHandler(e) {
     player.state.idleRight = false;
     player.state.idleLeft = true;
   }
+}
+
+// Score Display
+function drawScore() {
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "#fff";
+  ctx.fillText("Score: " + score, 8, canvas.height - 20);
 }
 
 // Player create
@@ -140,6 +148,8 @@ function animate() {
     ) {
       // Destroy Star
       stars.splice(index, 1);
+      // Update score
+      score++;
     }
   });
 
@@ -155,14 +165,20 @@ function animate() {
   player.update();
 
   timer++;
+  // Spawn Spikes
   if (timer % spikeRandomSpawnRate === 0) {
     spikes.push(new Spike(canvas, ctx));
     spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
   }
+  // Spawn Stars
   if (timer % starRandomSpawnRate === 0) {
     stars.push(new Star(canvas, ctx, groundHeight));
     starRandomSpawnRate = utils.randomIntFromRange(140, 280);
   }
+
+  // Display Score
+  drawScore();
+
   requestAnimationFrame(animate);
 }
 

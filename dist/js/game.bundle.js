@@ -203,6 +203,7 @@ var spikes = [];
 var fragments = [];
 var stars = [];
 var timer = 0;
+var score = 0;
 var spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
 var starRandomSpawnRate = _utils2.default.randomIntFromRange(120, 180);
 
@@ -236,6 +237,13 @@ function keyUpHandler(e) {
     player.state.idleRight = false;
     player.state.idleLeft = true;
   }
+}
+
+// Score Display
+function drawScore() {
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "#fff";
+  ctx.fillText("Score: " + score, 8, canvas.height - 20);
 }
 
 // Player create
@@ -300,6 +308,8 @@ function animate() {
     if (star.x - star.radius < player.x + player.frameWidth && star.x + star.radius > player.x && star.y - star.radius < player.y + player.frameHeight && star.y + star.radius > player.y) {
       // Destroy Star
       stars.splice(index, 1);
+      // Update score
+      score++;
     }
   });
 
@@ -315,14 +325,20 @@ function animate() {
   player.update();
 
   timer++;
+  // Spawn Spikes
   if (timer % spikeRandomSpawnRate === 0) {
     spikes.push(new _spike2.default(canvas, ctx));
     spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
   }
+  // Spawn Stars
   if (timer % starRandomSpawnRate === 0) {
     stars.push(new _star2.default(canvas, ctx, groundHeight));
     starRandomSpawnRate = _utils2.default.randomIntFromRange(140, 280);
   }
+
+  // Display Score
+  drawScore();
+
   requestAnimationFrame(animate);
 }
 
