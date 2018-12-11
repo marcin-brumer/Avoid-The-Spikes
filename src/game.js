@@ -17,12 +17,9 @@ let fragments = [];
 let stars = [];
 let timer = 0;
 let score = 0;
+let scale = 1;
 let spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
 let starRandomSpawnRate = utils.randomIntFromRange(120, 180);
-
-// Fullscreeen canvas
-canvas.width = innerWidth;
-canvas.height = innerHeight;
 
 // Event Listeners
 window.addEventListener("load", resizeGame, false);
@@ -52,6 +49,7 @@ function resizeGame() {
 
   canvas.width = newWidth;
   canvas.height = newHeight;
+  scale = canvas.height / 1080;
 }
 
 // Player controls
@@ -115,16 +113,17 @@ function animate() {
             radius,
             canvas,
             ctx,
-            groundHeight
+            groundHeight,
+            scale
           )
         );
       }
     }
     // Collision Spike-Player
     if (
-      spike.x < player.x + player.frameWidth &&
+      spike.x < player.x + player.scaledFrameWidth &&
       spike.x + spike.width > player.x &&
-      spike.y < player.y + player.frameHeight &&
+      spike.y < player.y + player.scaledFrameHeight &&
       spike.height + spike.y > player.y
     ) {
       // Destroy Spike
@@ -139,7 +138,8 @@ function animate() {
             radius,
             canvas,
             ctx,
-            groundHeight
+            groundHeight,
+            scale
           )
         );
       }
@@ -164,9 +164,9 @@ function animate() {
     }
     // Collision Star-Player
     if (
-      star.x - star.radius < player.x + player.frameWidth &&
+      star.x - star.radius < player.x + player.scaledFrameWidth &&
       star.x + star.radius > player.x &&
-      star.y - star.radius < player.y + player.frameHeight &&
+      star.y - star.radius < player.y + player.scaledFrameHeight &&
       star.y + star.radius > player.y
     ) {
       // Destroy Star

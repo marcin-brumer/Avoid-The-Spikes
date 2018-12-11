@@ -1,12 +1,15 @@
+import { scale } from "./utils";
+
 class Spike {
   constructor(canvas, ctx) {
+    this.canvas = canvas;
     this.ctx = ctx;
-    this.x = canvas.width * Math.random();
+    this.x = this.canvas.width * Math.random();
     this.y = 0;
-    this.width = 10;
-    this.height = 50;
     this.color = "#fff";
-    this.velocity = 15;
+    this.width = scale(10, this.canvas);
+    this.height = scale(50, this.canvas);
+    this.velocity = scale(15, this.canvas);
   }
 
   draw() {
@@ -26,6 +29,11 @@ class Spike {
   update() {
     this.y += this.velocity;
     this.draw();
+
+    // Keeps variables updated
+    this.width = scale(10, this.canvas);
+    this.height = scale(50, this.canvas);
+    this.velocity = scale(15, this.canvas);
   }
 }
 

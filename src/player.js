@@ -1,13 +1,21 @@
+import { scale } from "./utils";
+
 class Player {
   constructor(sprite, canvas, ctx, groundHeight) {
+    this.canvas = canvas;
     this.frameWidth = 90;
     this.frameHeight = 113.5;
-    this.x = canvas.width / 2;
-    this.y = canvas.height - groundHeight - this.frameHeight;
-    this.velocity = 10;
+    this.scaledFrameWidth = scale(this.frameWidth, this.canvas);
+    this.scaledFrameHeight = scale(this.frameHeight, this.canvas);
+    this.x = this.canvas.width / 2;
+    this.y =
+      this.canvas.height -
+      this.groundHeight -
+      scale(this.frameHeight, this.canvas);
+    this.velocity = scale(10, this.canvas);
     this.sprite = sprite;
     this.ctx = ctx;
-    this.canvas = canvas;
+
     this.groundHeight = groundHeight;
     this.frameNr = 1;
     this.runFrameCount = 20;
@@ -42,8 +50,8 @@ class Player {
       125.5,
       this.x,
       this.y,
-      150,
-      125.5
+      scale(150, this.canvas),
+      scale(125.5, this.canvas)
     );
     this.frameNr++;
   }
@@ -61,8 +69,8 @@ class Player {
       this.frameHeight,
       this.x,
       this.y,
-      this.frameWidth,
-      this.frameHeight
+      this.scaledFrameWidth,
+      this.scaledFrameHeight
     );
     this.frameNr++;
   }
@@ -70,7 +78,7 @@ class Player {
   update() {
     if (this.state.runningRight) {
       this.draw(this.frameXpos.runningRight, this.runFrameCount);
-      if (this.x + this.frameWidth < this.canvas.width) {
+      if (this.x + this.scaledFrameWidth < this.canvas.width) {
         this.x += this.velocity;
       }
     } else if (this.state.runningLeft) {
@@ -85,8 +93,15 @@ class Player {
     } else if (this.state.dead) {
       this.deathAnim();
     }
-    // Keeps player Y position when screen is resized
-    this.y = this.canvas.height - this.groundHeight - this.frameHeight;
+
+    // Keeps variables updated
+    this.scaledFrameWidth = scale(this.frameWidth, this.canvas);
+    this.scaledFrameHeight = scale(this.frameHeight, this.canvas);
+    this.y =
+      this.canvas.height -
+      this.groundHeight -
+      scale(this.frameHeight, this.canvas);
+    this.velocity = scale(10, this.canvas);
   }
 }
 

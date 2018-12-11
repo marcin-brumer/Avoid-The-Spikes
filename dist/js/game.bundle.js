@@ -105,7 +105,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Fragment = function () {
-  function Fragment(x, y, radius, canvas, ctx, groundHeight) {
+  function Fragment(x, y, radius, canvas, ctx, groundHeight, scale) {
     _classCallCheck(this, Fragment);
 
     this.canvas = canvas;
@@ -113,10 +113,10 @@ var Fragment = function () {
     this.groundHeight = groundHeight;
     this.x = x;
     this.y = y;
-    this.radius = radius;
+    this.radius = radius * scale;
     this.velocity = {
-      x: (Math.random() - 0.5) * 4,
-      y: 4
+      x: (Math.random() - 0.5) * 4 * scale,
+      y: 4 * scale
     };
     this.friction = 0.4;
     this.gravity = 0.4;
@@ -205,12 +205,9 @@ var fragments = [];
 var stars = [];
 var timer = 0;
 var score = 0;
+var scale = 1;
 var spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
 var starRandomSpawnRate = _utils2.default.randomIntFromRange(120, 180);
-
-// Fullscreeen canvas
-canvas.width = innerWidth;
-canvas.height = innerHeight;
 
 // Event Listeners
 window.addEventListener("load", resizeGame, false);
@@ -240,6 +237,7 @@ function resizeGame() {
 
   canvas.width = newWidth;
   canvas.height = newHeight;
+  scale = canvas.height / 1080;
 }
 
 // Player controls
@@ -296,17 +294,17 @@ function animate() {
       // Create fragments
       for (var i = 0; i < 8; i++) {
         var radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - radius, radius, canvas, ctx, groundHeight));
+        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - radius, radius, canvas, ctx, groundHeight, scale));
       }
     }
     // Collision Spike-Player
-    if (spike.x < player.x + player.frameWidth && spike.x + spike.width > player.x && spike.y < player.y + player.frameHeight && spike.height + spike.y > player.y) {
+    if (spike.x < player.x + player.scaledFrameWidth && spike.x + spike.width > player.x && spike.y < player.y + player.scaledFrameHeight && spike.height + spike.y > player.y) {
       // Destroy Spike
       spikes.splice(index, 1);
       // Create fragments
       for (var _i = 0; _i < 8; _i++) {
         var _radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _radius, _radius, canvas, ctx, groundHeight));
+        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _radius, _radius, canvas, ctx, groundHeight, scale));
       }
       // Player death
       player.state = {
@@ -328,7 +326,7 @@ function animate() {
       stars.splice(index, 1);
     }
     // Collision Star-Player
-    if (star.x - star.radius < player.x + player.frameWidth && star.x + star.radius > player.x && star.y - star.radius < player.y + player.frameHeight && star.y + star.radius > player.y) {
+    if (star.x - star.radius < player.x + player.scaledFrameWidth && star.x + star.radius > player.x && star.y - star.radius < player.y + player.scaledFrameHeight && star.y + star.radius > player.y) {
       // Destroy Star
       stars.splice(index, 1);
       // Update score
@@ -385,20 +383,25 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Player = function () {
   function Player(sprite, canvas, ctx, groundHeight) {
     _classCallCheck(this, Player);
 
+    this.canvas = canvas;
     this.frameWidth = 90;
     this.frameHeight = 113.5;
-    this.x = canvas.width / 2;
-    this.y = canvas.height - groundHeight - this.frameHeight;
-    this.velocity = 10;
+    this.scaledFrameWidth = (0, _utils.scale)(this.frameWidth, this.canvas);
+    this.scaledFrameHeight = (0, _utils.scale)(this.frameHeight, this.canvas);
+    this.x = this.canvas.width / 2;
+    this.y = this.canvas.height - this.groundHeight - (0, _utils.scale)(this.frameHeight, this.canvas);
+    this.velocity = (0, _utils.scale)(10, this.canvas);
     this.sprite = sprite;
     this.ctx = ctx;
-    this.canvas = canvas;
+
     this.groundHeight = groundHeight;
     this.frameNr = 1;
     this.runFrameCount = 20;
@@ -427,7 +430,7 @@ var Player = function () {
         this.frameNr = 30;
       }
       var frameYpos = (this.frameNr - 1) * 125.5;
-      this.ctx.drawImage(this.sprite, this.frameXpos.dead, frameYpos, 150, 125.5, this.x, this.y, 150, 125.5);
+      this.ctx.drawImage(this.sprite, this.frameXpos.dead, frameYpos, 150, 125.5, this.x, this.y, (0, _utils.scale)(150, this.canvas), (0, _utils.scale)(125.5, this.canvas));
       this.frameNr++;
     }
   }, {
@@ -437,7 +440,7 @@ var Player = function () {
         this.frameNr = 1;
       }
       var frameYpos = (this.frameNr - 1) * this.frameHeight;
-      this.ctx.drawImage(this.sprite, frameXpos, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.frameWidth, this.frameHeight);
+      this.ctx.drawImage(this.sprite, frameXpos, frameYpos, this.frameWidth, this.frameHeight, this.x, this.y, this.scaledFrameWidth, this.scaledFrameHeight);
       this.frameNr++;
     }
   }, {
@@ -445,7 +448,7 @@ var Player = function () {
     value: function update() {
       if (this.state.runningRight) {
         this.draw(this.frameXpos.runningRight, this.runFrameCount);
-        if (this.x + this.frameWidth < this.canvas.width) {
+        if (this.x + this.scaledFrameWidth < this.canvas.width) {
           this.x += this.velocity;
         }
       } else if (this.state.runningLeft) {
@@ -460,8 +463,12 @@ var Player = function () {
       } else if (this.state.dead) {
         this.deathAnim();
       }
-      // Keeps player Y position when screen is resized
-      this.y = this.canvas.height - this.groundHeight - this.frameHeight;
+
+      // Keeps variables updated
+      this.scaledFrameWidth = (0, _utils.scale)(this.frameWidth, this.canvas);
+      this.scaledFrameHeight = (0, _utils.scale)(this.frameHeight, this.canvas);
+      this.y = this.canvas.height - this.groundHeight - (0, _utils.scale)(this.frameHeight, this.canvas);
+      this.velocity = (0, _utils.scale)(10, this.canvas);
     }
   }]);
 
@@ -488,19 +495,22 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Spike = function () {
   function Spike(canvas, ctx) {
     _classCallCheck(this, Spike);
 
+    this.canvas = canvas;
     this.ctx = ctx;
-    this.x = canvas.width * Math.random();
+    this.x = this.canvas.width * Math.random();
     this.y = 0;
-    this.width = 10;
-    this.height = 50;
     this.color = "#fff";
-    this.velocity = 15;
+    this.width = (0, _utils.scale)(10, this.canvas);
+    this.height = (0, _utils.scale)(50, this.canvas);
+    this.velocity = (0, _utils.scale)(15, this.canvas);
   }
 
   _createClass(Spike, [{
@@ -523,6 +533,11 @@ var Spike = function () {
     value: function update() {
       this.y += this.velocity;
       this.draw();
+
+      // Keeps variables updated
+      this.width = (0, _utils.scale)(10, this.canvas);
+      this.height = (0, _utils.scale)(50, this.canvas);
+      this.velocity = (0, _utils.scale)(15, this.canvas);
     }
   }]);
 
@@ -549,21 +564,23 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Star = function () {
   function Star(canvas, ctx, groundHeight) {
     _classCallCheck(this, Star);
 
+    this.canvas = canvas;
     this.x = canvas.width * Math.random();
     this.y = 0;
-    this.radius = 15;
-    this.velocity = 5;
+    this.radius = (0, _utils.scale)(15, this.canvas);
+    this.velocity = (0, _utils.scale)(5, this.canvas);
     this.ctx = ctx;
     this.opacity = 1;
     this.timeToLive = 50;
     this.groundHeight = groundHeight;
-    this.canvas = canvas;
   }
 
   _createClass(Star, [{
@@ -596,6 +613,10 @@ var Star = function () {
       }
 
       this.draw();
+
+      // Keeps variables updated
+      this.radius = (0, _utils.scale)(15, this.canvas);
+      this.velocity = (0, _utils.scale)(5, this.canvas);
     }
   }]);
 
@@ -631,7 +652,11 @@ function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
 }
 
-module.exports = { randomIntFromRange: randomIntFromRange, randomColor: randomColor, distance: distance };
+function scale(elem, canvas) {
+  return elem * canvas.height / 1080;
+}
+
+module.exports = { randomIntFromRange: randomIntFromRange, randomColor: randomColor, distance: distance, scale: scale };
 
 /***/ })
 

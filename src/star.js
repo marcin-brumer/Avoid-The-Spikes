@@ -1,14 +1,16 @@
+import { scale } from "./utils";
+
 class Star {
   constructor(canvas, ctx, groundHeight) {
+    this.canvas = canvas;
     this.x = canvas.width * Math.random();
     this.y = 0;
-    this.radius = 15;
-    this.velocity = 5;
+    this.radius = scale(15, this.canvas);
+    this.velocity = scale(5, this.canvas);
     this.ctx = ctx;
     this.opacity = 1;
     this.timeToLive = 50;
     this.groundHeight = groundHeight;
-    this.canvas = canvas;
   }
 
   draw() {
@@ -38,6 +40,10 @@ class Star {
     }
 
     this.draw();
+
+    // Keeps variables updated
+    this.radius = scale(15, this.canvas);
+    this.velocity = scale(5, this.canvas);
   }
 }
 

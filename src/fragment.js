@@ -1,14 +1,14 @@
 class Fragment {
-  constructor(x, y, radius, canvas, ctx, groundHeight) {
+  constructor(x, y, radius, canvas, ctx, groundHeight, scale) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.groundHeight = groundHeight;
     this.x = x;
     this.y = y;
-    this.radius = radius;
+    this.radius = radius * scale;
     this.velocity = {
-      x: (Math.random() - 0.5) * 4,
-      y: 4
+      x: (Math.random() - 0.5) * 4 * scale,
+      y: 4 * scale
     };
     this.friction = 0.4;
     this.gravity = 0.4;
