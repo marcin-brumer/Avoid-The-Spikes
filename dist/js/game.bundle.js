@@ -192,7 +192,8 @@ var _star2 = _interopRequireDefault(_star);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var canvas = document.querySelector("canvas");
+var gameArea = document.getElementById("gameArea");
+var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
 var groundHeight = 100;
 var backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -212,12 +213,34 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 // Event Listeners
-window.addEventListener("resize", function () {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-});
+window.addEventListener("load", resizeGame, false);
+window.addEventListener("resize", resizeGame, false);
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+
+// Scale canvas to fit window (16:9 ratio)
+function resizeGame() {
+  var widthToHeight = 16 / 9;
+  var newWidth = window.innerWidth;
+  var newHeight = window.innerHeight;
+  var newWidthToHeight = newWidth / newHeight;
+
+  if (newWidthToHeight > widthToHeight) {
+    newWidth = newHeight * widthToHeight;
+    gameArea.style.height = newHeight + "px";
+    gameArea.style.width = newWidth + "px";
+  } else {
+    newHeight = newWidth / widthToHeight;
+    gameArea.style.width = newWidth + "px";
+    gameArea.style.height = newHeight + "px";
+  }
+
+  gameArea.style.marginTop = -newHeight / 2 + "px";
+  gameArea.style.marginLeft = -newWidth / 2 + "px";
+
+  canvas.width = newWidth;
+  canvas.height = newHeight;
+}
 
 // Player controls
 function keyDownHandler(e) {
