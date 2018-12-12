@@ -198,7 +198,6 @@ var gameArea = document.getElementById("gameArea");
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
 var groundHeight = 100;
-var backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
 var sprite = new Image();
 sprite.src = "./img/sprite.png";
 
@@ -270,15 +269,9 @@ function drawScore() {
 // Player create
 var player = new _player2.default(sprite, canvas, ctx, groundHeight);
 
-// Background color
-backgroundGradient.addColorStop(0, "#171e26");
-backgroundGradient.addColorStop(1, "#3f586b");
-
 // Animation Loop
 function animate() {
-  // Background
-  ctx.fillStyle = backgroundGradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Ground
   ctx.fillStyle = "#0D0909";

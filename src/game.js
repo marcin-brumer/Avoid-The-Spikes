@@ -8,7 +8,6 @@ const gameArea = document.getElementById("gameArea");
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const groundHeight = 100;
-const backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
 const sprite = new Image();
 sprite.src = "./img/sprite.png";
 
@@ -84,15 +83,9 @@ function drawScore() {
 // Player create
 const player = new Player(sprite, canvas, ctx, groundHeight);
 
-// Background color
-backgroundGradient.addColorStop(0, "#171e26");
-backgroundGradient.addColorStop(1, "#3f586b");
-
 // Animation Loop
 function animate() {
-  // Background
-  ctx.fillStyle = backgroundGradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Ground
   ctx.fillStyle = "#0D0909";
