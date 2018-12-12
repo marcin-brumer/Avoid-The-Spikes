@@ -102,10 +102,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Fragment = function () {
-  function Fragment(x, y, radius, canvas, ctx, groundHeight, scale) {
+  function Fragment(x, y, radius, canvas, ctx, groundHeight) {
     _classCallCheck(this, Fragment);
 
     this.canvas = canvas;
@@ -113,10 +115,10 @@ var Fragment = function () {
     this.groundHeight = groundHeight;
     this.x = x;
     this.y = y;
-    this.radius = radius * scale;
+    this.radius = (0, _utils.scale)(radius, this.canvas);
     this.velocity = {
-      x: (Math.random() - 0.5) * 4 * scale,
-      y: 4 * scale
+      x: (0, _utils.scale)((Math.random() - 0.5) * 4, this.canvas),
+      y: (0, _utils.scale)(4, this.canvas)
     };
     this.friction = 0.4;
     this.gravity = 0.4;
@@ -137,7 +139,7 @@ var Fragment = function () {
   }, {
     key: "update",
     value: function update() {
-      if (this.y + this.velocity.y + this.radius >= this.canvas.height - this.groundHeight) {
+      if (this.y + this.velocity.y + this.radius >= this.canvas.height - (0, _utils.scale)(this.groundHeight, this.canvas)) {
         this.velocity.y = -this.velocity.y * this.friction;
         this.velocity.x *= 0.9;
       } else {
@@ -205,7 +207,6 @@ var fragments = [];
 var stars = [];
 var timer = 0;
 var score = 0;
-var scale = 1;
 var spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
 var starRandomSpawnRate = _utils2.default.randomIntFromRange(120, 180);
 
@@ -237,7 +238,6 @@ function resizeGame() {
 
   canvas.width = newWidth;
   canvas.height = newHeight;
-  scale = canvas.height / 1080;
 }
 
 // Player controls
@@ -262,9 +262,9 @@ function keyUpHandler(e) {
 
 // Score Display
 function drawScore() {
-  ctx.font = "30px Arial";
+  ctx.font = _utils2.default.scale(35, canvas) + "px Arial";
   ctx.fillStyle = "#fff";
-  ctx.fillText("Score: " + score, 8, canvas.height - 20);
+  ctx.fillText("Score: " + score, 8, canvas.height - 0.35 * _utils2.default.scale(groundHeight, canvas));
 }
 
 // Player create
@@ -282,19 +282,19 @@ function animate() {
 
   // Ground
   ctx.fillStyle = "#0D0909";
-  ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+  ctx.fillRect(0, canvas.height - _utils2.default.scale(groundHeight, canvas), canvas.width, _utils2.default.scale(groundHeight, canvas));
 
   // Spikes animation
   spikes.forEach(function (spike, index) {
     spike.update();
     // Collision Spike-Ground
-    if (spike.y + spike.height >= canvas.height - groundHeight) {
+    if (spike.y + spike.height >= canvas.height - _utils2.default.scale(groundHeight, canvas)) {
       // Destroy Spike
       spikes.splice(index, 1);
       // Create fragments
       for (var i = 0; i < 8; i++) {
         var radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - radius, radius, canvas, ctx, groundHeight, scale));
+        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _utils2.default.scale(radius, canvas), radius, canvas, ctx, groundHeight));
       }
     }
     // Collision Spike-Player
@@ -304,7 +304,7 @@ function animate() {
       // Create fragments
       for (var _i = 0; _i < 8; _i++) {
         var _radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _radius, _radius, canvas, ctx, groundHeight, scale));
+        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _utils2.default.scale(_radius, canvas), _radius, canvas, ctx, groundHeight));
       }
       // Player death
       player.state = {
@@ -391,18 +391,17 @@ var Player = function () {
   function Player(sprite, canvas, ctx, groundHeight) {
     _classCallCheck(this, Player);
 
+    this.sprite = sprite;
     this.canvas = canvas;
+    this.ctx = ctx;
+    this.groundHeight = groundHeight;
     this.frameWidth = 90;
     this.frameHeight = 113.5;
     this.scaledFrameWidth = (0, _utils.scale)(this.frameWidth, this.canvas);
     this.scaledFrameHeight = (0, _utils.scale)(this.frameHeight, this.canvas);
     this.x = this.canvas.width / 2;
-    this.y = this.canvas.height - this.groundHeight - (0, _utils.scale)(this.frameHeight, this.canvas);
+    this.y = this.canvas.height - (0, _utils.scale)(this.groundHeight, this.canvas) - (0, _utils.scale)(this.frameHeight, this.canvas);
     this.velocity = (0, _utils.scale)(10, this.canvas);
-    this.sprite = sprite;
-    this.ctx = ctx;
-
-    this.groundHeight = groundHeight;
     this.frameNr = 1;
     this.runFrameCount = 20;
     this.idleFrameCount = 16;
@@ -467,7 +466,7 @@ var Player = function () {
       // Keeps variables updated
       this.scaledFrameWidth = (0, _utils.scale)(this.frameWidth, this.canvas);
       this.scaledFrameHeight = (0, _utils.scale)(this.frameHeight, this.canvas);
-      this.y = this.canvas.height - this.groundHeight - (0, _utils.scale)(this.frameHeight, this.canvas);
+      this.y = this.canvas.height - (0, _utils.scale)(this.groundHeight, this.canvas) - (0, _utils.scale)(this.frameHeight, this.canvas);
       this.velocity = (0, _utils.scale)(10, this.canvas);
     }
   }]);
@@ -573,14 +572,14 @@ var Star = function () {
     _classCallCheck(this, Star);
 
     this.canvas = canvas;
+    this.ctx = ctx;
+    this.groundHeight = groundHeight;
     this.x = canvas.width * Math.random();
     this.y = 0;
     this.radius = (0, _utils.scale)(15, this.canvas);
     this.velocity = (0, _utils.scale)(5, this.canvas);
-    this.ctx = ctx;
     this.opacity = 1;
     this.timeToLive = 50;
-    this.groundHeight = groundHeight;
   }
 
   _createClass(Star, [{
@@ -605,7 +604,7 @@ var Star = function () {
   }, {
     key: "update",
     value: function update() {
-      if (this.y + this.radius < this.canvas.height - this.groundHeight) {
+      if (this.y + this.radius < this.canvas.height - (0, _utils.scale)(this.groundHeight, this.canvas)) {
         this.y += this.velocity;
       } else {
         this.timeToLive--;

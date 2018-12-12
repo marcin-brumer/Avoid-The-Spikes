@@ -1,14 +1,16 @@
+import { scale } from "./utils";
+
 class Fragment {
-  constructor(x, y, radius, canvas, ctx, groundHeight, scale) {
+  constructor(x, y, radius, canvas, ctx, groundHeight) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.groundHeight = groundHeight;
     this.x = x;
     this.y = y;
-    this.radius = radius * scale;
+    this.radius = scale(radius, this.canvas);
     this.velocity = {
-      x: (Math.random() - 0.5) * 4 * scale,
-      y: 4 * scale
+      x: scale((Math.random() - 0.5) * 4, this.canvas),
+      y: scale(4, this.canvas)
     };
     this.friction = 0.4;
     this.gravity = 0.4;
@@ -28,7 +30,7 @@ class Fragment {
   update() {
     if (
       this.y + this.velocity.y + this.radius >=
-      this.canvas.height - this.groundHeight
+      this.canvas.height - scale(this.groundHeight, this.canvas)
     ) {
       this.velocity.y = -this.velocity.y * this.friction;
       this.velocity.x *= 0.9;

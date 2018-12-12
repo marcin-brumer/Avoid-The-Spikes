@@ -2,7 +2,10 @@ import { scale } from "./utils";
 
 class Player {
   constructor(sprite, canvas, ctx, groundHeight) {
+    this.sprite = sprite;
     this.canvas = canvas;
+    this.ctx = ctx;
+    this.groundHeight = groundHeight;
     this.frameWidth = 90;
     this.frameHeight = 113.5;
     this.scaledFrameWidth = scale(this.frameWidth, this.canvas);
@@ -10,13 +13,9 @@ class Player {
     this.x = this.canvas.width / 2;
     this.y =
       this.canvas.height -
-      this.groundHeight -
+      scale(this.groundHeight, this.canvas) -
       scale(this.frameHeight, this.canvas);
     this.velocity = scale(10, this.canvas);
-    this.sprite = sprite;
-    this.ctx = ctx;
-
-    this.groundHeight = groundHeight;
     this.frameNr = 1;
     this.runFrameCount = 20;
     this.idleFrameCount = 16;
@@ -99,7 +98,7 @@ class Player {
     this.scaledFrameHeight = scale(this.frameHeight, this.canvas);
     this.y =
       this.canvas.height -
-      this.groundHeight -
+      scale(this.groundHeight, this.canvas) -
       scale(this.frameHeight, this.canvas);
     this.velocity = scale(10, this.canvas);
   }

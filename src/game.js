@@ -17,7 +17,6 @@ let fragments = [];
 let stars = [];
 let timer = 0;
 let score = 0;
-let scale = 1;
 let spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
 let starRandomSpawnRate = utils.randomIntFromRange(120, 180);
 
@@ -49,7 +48,6 @@ function resizeGame() {
 
   canvas.width = newWidth;
   canvas.height = newHeight;
-  scale = canvas.height / 1080;
 }
 
 // Player controls
@@ -74,9 +72,13 @@ function keyUpHandler(e) {
 
 // Score Display
 function drawScore() {
-  ctx.font = "30px Arial";
+  ctx.font = `${utils.scale(35, canvas)}px Arial`;
   ctx.fillStyle = "#fff";
-  ctx.fillText("Score: " + score, 8, canvas.height - 20);
+  ctx.fillText(
+    "Score: " + score,
+    8,
+    canvas.height - 0.35 * utils.scale(groundHeight, canvas)
+  );
 }
 
 // Player create
@@ -94,13 +96,21 @@ function animate() {
 
   // Ground
   ctx.fillStyle = "#0D0909";
-  ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+  ctx.fillRect(
+    0,
+    canvas.height - utils.scale(groundHeight, canvas),
+    canvas.width,
+    utils.scale(groundHeight, canvas)
+  );
 
   // Spikes animation
   spikes.forEach((spike, index) => {
     spike.update();
     // Collision Spike-Ground
-    if (spike.y + spike.height >= canvas.height - groundHeight) {
+    if (
+      spike.y + spike.height >=
+      canvas.height - utils.scale(groundHeight, canvas)
+    ) {
       // Destroy Spike
       spikes.splice(index, 1);
       // Create fragments
@@ -109,12 +119,11 @@ function animate() {
         fragments.push(
           new Fragment(
             spike.x,
-            spike.y + spike.height - radius,
+            spike.y + spike.height - utils.scale(radius, canvas),
             radius,
             canvas,
             ctx,
-            groundHeight,
-            scale
+            groundHeight
           )
         );
       }
@@ -134,12 +143,11 @@ function animate() {
         fragments.push(
           new Fragment(
             spike.x,
-            spike.y + spike.height - radius,
+            spike.y + spike.height - utils.scale(radius, canvas),
             radius,
             canvas,
             ctx,
-            groundHeight,
-            scale
+            groundHeight
           )
         );
       }

@@ -3,14 +3,14 @@ import { scale } from "./utils";
 class Star {
   constructor(canvas, ctx, groundHeight) {
     this.canvas = canvas;
+    this.ctx = ctx;
+    this.groundHeight = groundHeight;
     this.x = canvas.width * Math.random();
     this.y = 0;
     this.radius = scale(15, this.canvas);
     this.velocity = scale(5, this.canvas);
-    this.ctx = ctx;
     this.opacity = 1;
     this.timeToLive = 50;
-    this.groundHeight = groundHeight;
   }
 
   draw() {
@@ -32,7 +32,10 @@ class Star {
   }
 
   update() {
-    if (this.y + this.radius < this.canvas.height - this.groundHeight) {
+    if (
+      this.y + this.radius <
+      this.canvas.height - scale(this.groundHeight, this.canvas)
+    ) {
       this.y += this.velocity;
     } else {
       this.timeToLive--;
