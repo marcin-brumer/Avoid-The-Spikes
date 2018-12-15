@@ -5,6 +5,7 @@ import Player from "./player";
 import Star from "./star";
 import "./index.scss";
 
+const loader = document.getElementById("loader");
 const gameArea = document.getElementById("gameArea");
 const canvas = document.getElementById("gameCanvas");
 const startMenu = document.getElementById("start_menu");
@@ -28,7 +29,18 @@ let runAnim = false; //Check if animation should run
 let player; // Player instance
 
 // Event Listeners
-window.addEventListener("load", resizeGame, false);
+window.addEventListener(
+  "load",
+  () => {
+    resizeGame();
+    // Lets loader run for 1,5s, because otherwise it's load too fast and it doesn't look good
+    setTimeout(() => {
+      loader.style.display = "none";
+      gameArea.style.display = "block";
+    }, 1500);
+  },
+  false
+);
 window.addEventListener("resize", resizeGame, false);
 startBtn.addEventListener("click", () => {
   // Enable controls

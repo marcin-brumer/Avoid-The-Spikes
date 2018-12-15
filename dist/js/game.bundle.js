@@ -95,7 +95,7 @@
 
 exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
-exports.push([module.i, "body {\n  margin: 0;\n  overflow: hidden;\n  background-color: #111; }\n  body #gameArea {\n    position: absolute;\n    left: 50%;\n    top: 50%; }\n    body #gameArea #gameCanvas {\n      width: 100%;\n      height: 100%;\n      background-image: url(\"https://raw.githubusercontent.com/marcin-brumer/Avoid-The-Spikes/master/dist/img/background.jpg\");\n      background-size: 100% 100%; }\n    body #gameArea .menu {\n      background-color: rgba(0, 0, 0, 0.8);\n      position: absolute;\n      left: 30%;\n      top: 25%;\n      width: 40%;\n      height: 50%;\n      border-radius: 10%;\n      border: 1vh solid #fff;\n      text-align: center;\n      color: #fff; }\n      body #gameArea .menu h1 {\n        font-size: 7vh; }\n      body #gameArea .menu p {\n        font-size: 4vh; }\n      body #gameArea .menu .button {\n        position: absolute;\n        left: 50%;\n        top: 70%;\n        transform: translate(-50%, -50%);\n        padding: 1vh 4vh;\n        font-size: 2.5vh;\n        border-radius: 1vh;\n        text-decoration: none;\n        outline: none;\n        color: #fff;\n        background-color: #3498db;\n        border: none;\n        border-bottom: 0.6vh solid #2980b9;\n        cursor: pointer; }\n        body #gameArea .menu .button:active {\n          transform: translate(-50%, -45%);\n          border-bottom: none; }\n    body #gameArea #game_over_menu {\n      display: none; }\n", ""]);
+exports.push([module.i, "body {\n  margin: 0;\n  overflow: hidden;\n  background-color: #111; }\n  body #loader {\n    position: absolute;\n    left: 50%;\n    top: 50%;\n    transform: translate(-50%, -50%); }\n    body #loader .bar {\n      width: 6px;\n      height: 60px;\n      background: #2980b9;\n      display: inline-block;\n      animation: loading 1.5s ease-in-out infinite; }\n    body #loader .bar1 {\n      animation-delay: 0.1s; }\n    body #loader .bar2 {\n      animation-delay: 0.2s; }\n    body #loader .bar3 {\n      animation-delay: 0.3s; }\n    body #loader .bar4 {\n      animation-delay: 0.4s; }\n    body #loader .bar5 {\n      animation-delay: 0.5s; }\n    body #loader .bar6 {\n      animation-delay: 0.6s; }\n    body #loader .bar7 {\n      animation-delay: 0.7s; }\n    body #loader .bar8 {\n      animation-delay: 0.8s; }\n\n@keyframes loading {\n  0% {\n    transform: scaleY(1);\n    background: #2980b9; }\n  50% {\n    transform: scaleY(0);\n    background: transparent; }\n  100% {\n    transform: scaleY(1);\n    background: #2980b9; } }\n  body #gameArea {\n    position: absolute;\n    left: 50%;\n    top: 50%;\n    display: none; }\n    body #gameArea #gameCanvas {\n      width: 100%;\n      height: 100%;\n      background-image: url(\"https://raw.githubusercontent.com/marcin-brumer/Avoid-The-Spikes/master/dist/img/background.jpg\");\n      background-size: 100% 100%; }\n    body #gameArea .menu {\n      background-color: rgba(0, 0, 0, 0.8);\n      position: absolute;\n      left: 30%;\n      top: 25%;\n      width: 40%;\n      height: 50%;\n      border-radius: 10%;\n      border: 1vh solid #fff;\n      text-align: center;\n      color: #fff; }\n      body #gameArea .menu h1 {\n        font-size: 7vh; }\n      body #gameArea .menu p {\n        font-size: 4vh; }\n      body #gameArea .menu .button {\n        position: absolute;\n        left: 50%;\n        top: 70%;\n        transform: translate(-50%, -50%);\n        padding: 1vh 4vh;\n        font-size: 2.5vh;\n        border-radius: 1vh;\n        text-decoration: none;\n        outline: none;\n        color: #fff;\n        background-color: #3498db;\n        border: none;\n        border-bottom: 0.6vh solid #2980b9;\n        cursor: pointer; }\n        body #gameArea .menu .button:active {\n          transform: translate(-50%, -45%);\n          border-bottom: none; }\n    body #gameArea #game_over_menu {\n      display: none; }\n", ""]);
 
 
 
@@ -816,6 +816,7 @@ __webpack_require__(/*! ./index.scss */ "./src/index.scss");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var loader = document.getElementById("loader");
 var gameArea = document.getElementById("gameArea");
 var canvas = document.getElementById("gameCanvas");
 var startMenu = document.getElementById("start_menu");
@@ -839,7 +840,14 @@ var runAnim = false; //Check if animation should run
 var player = void 0; // Player instance
 
 // Event Listeners
-window.addEventListener("load", resizeGame, false);
+window.addEventListener("load", function () {
+  resizeGame();
+  // Lets loader run for 1,5s, because otherwise it's load too fast and it doesn't look good
+  setTimeout(function () {
+    loader.style.display = "none";
+    gameArea.style.display = "block";
+  }, 1500);
+}, false);
 window.addEventListener("resize", resizeGame, false);
 startBtn.addEventListener("click", function () {
   // Enable controls
