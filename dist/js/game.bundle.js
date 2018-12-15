@@ -81,19 +81,19 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/game.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/js/game.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/lib/loader.js!./src/index.scss":
-/*!*******************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/lib/loader.js!./src/index.scss ***!
-  \*******************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/lib/loader.js!./src/scss/index.scss":
+/*!************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/lib/loader.js!./src/scss/index.scss ***!
+  \************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
 exports.push([module.i, "body {\n  margin: 0;\n  overflow: hidden;\n  background-color: #111; }\n  body #loader {\n    position: absolute;\n    left: 50%;\n    top: 50%;\n    transform: translate(-50%, -50%); }\n    body #loader .bar {\n      width: 6px;\n      height: 60px;\n      background: #2980b9;\n      display: inline-block;\n      animation: loading 1.5s ease-in-out infinite; }\n    body #loader .bar1 {\n      animation-delay: 0.1s; }\n    body #loader .bar2 {\n      animation-delay: 0.2s; }\n    body #loader .bar3 {\n      animation-delay: 0.3s; }\n    body #loader .bar4 {\n      animation-delay: 0.4s; }\n    body #loader .bar5 {\n      animation-delay: 0.5s; }\n    body #loader .bar6 {\n      animation-delay: 0.6s; }\n    body #loader .bar7 {\n      animation-delay: 0.7s; }\n    body #loader .bar8 {\n      animation-delay: 0.8s; }\n\n@keyframes loading {\n  0% {\n    transform: scaleY(1);\n    background: #2980b9; }\n  50% {\n    transform: scaleY(0);\n    background: transparent; }\n  100% {\n    transform: scaleY(1);\n    background: #2980b9; } }\n  body #gameArea {\n    position: absolute;\n    left: 50%;\n    top: 50%;\n    display: none; }\n    body #gameArea #gameCanvas {\n      width: 100%;\n      height: 100%;\n      background-image: url(\"https://raw.githubusercontent.com/marcin-brumer/Avoid-The-Spikes/master/dist/img/background.jpg\");\n      background-size: 100% 100%; }\n    body #gameArea .menu {\n      background-color: rgba(0, 0, 0, 0.8);\n      position: absolute;\n      left: 30%;\n      top: 25%;\n      width: 40%;\n      height: 50%;\n      border-radius: 10%;\n      border: 1vh solid #fff;\n      text-align: center;\n      color: #fff; }\n      body #gameArea .menu h1 {\n        font-size: 7vh; }\n      body #gameArea .menu p {\n        font-size: 4vh; }\n      body #gameArea .menu .button {\n        position: absolute;\n        left: 50%;\n        top: 70%;\n        transform: translate(-50%, -50%);\n        padding: 1vh 4vh;\n        font-size: 2.5vh;\n        border-radius: 1vh;\n        text-decoration: none;\n        outline: none;\n        color: #fff;\n        background-color: #3498db;\n        border: none;\n        border-bottom: 0.6vh solid #2980b9;\n        cursor: pointer; }\n        body #gameArea .menu .button:active {\n          transform: translate(-50%, -45%);\n          border-bottom: none; }\n    body #gameArea #game_over_menu {\n      display: none; }\n", ""]);
 
@@ -706,10 +706,10 @@ module.exports = function (css) {
 
 /***/ }),
 
-/***/ "./src/fragment.js":
-/*!*************************!*\
-  !*** ./src/fragment.js ***!
-  \*************************/
+/***/ "./src/js/fragment.js":
+/*!****************************!*\
+  !*** ./src/js/fragment.js ***!
+  \****************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -722,7 +722,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+var _utils = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -782,37 +782,37 @@ exports.default = Fragment;
 
 /***/ }),
 
-/***/ "./src/game.js":
-/*!*********************!*\
-  !*** ./src/game.js ***!
-  \*********************/
+/***/ "./src/js/game.js":
+/*!************************!*\
+  !*** ./src/js/game.js ***!
+  \************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+var _utils = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _fragment = __webpack_require__(/*! ./fragment */ "./src/fragment.js");
+var _fragment = __webpack_require__(/*! ./fragment */ "./src/js/fragment.js");
 
 var _fragment2 = _interopRequireDefault(_fragment);
 
-var _spike = __webpack_require__(/*! ./spike */ "./src/spike.js");
+var _spike = __webpack_require__(/*! ./spike */ "./src/js/spike.js");
 
 var _spike2 = _interopRequireDefault(_spike);
 
-var _player = __webpack_require__(/*! ./player */ "./src/player.js");
+var _player = __webpack_require__(/*! ./player */ "./src/js/player.js");
 
 var _player2 = _interopRequireDefault(_player);
 
-var _star = __webpack_require__(/*! ./star */ "./src/star.js");
+var _star = __webpack_require__(/*! ./star */ "./src/js/star.js");
 
 var _star2 = _interopRequireDefault(_star);
 
-__webpack_require__(/*! ./index.scss */ "./src/index.scss");
+__webpack_require__(/*! ../scss/index.scss */ "./src/scss/index.scss");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1031,40 +1031,10 @@ function animate() {
 
 /***/ }),
 
-/***/ "./src/index.scss":
-/*!************************!*\
-  !*** ./src/index.scss ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-var content = __webpack_require__(/*! !../node_modules/css-loader/dist/cjs.js!../node_modules/sass-loader/lib/loader.js!./index.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/lib/loader.js!./src/index.scss");
-
-if(typeof content === 'string') content = [[module.i, content, '']];
-
-var transform;
-var insertInto;
-
-
-
-var options = {"hmr":true}
-
-options.transform = transform
-options.insertInto = undefined;
-
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
-
-if(content.locals) module.exports = content.locals;
-
-if(false) {}
-
-/***/ }),
-
-/***/ "./src/player.js":
-/*!***********************!*\
-  !*** ./src/player.js ***!
-  \***********************/
+/***/ "./src/js/player.js":
+/*!**************************!*\
+  !*** ./src/js/player.js ***!
+  \**************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1077,7 +1047,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+var _utils = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1172,10 +1142,10 @@ exports.default = Player;
 
 /***/ }),
 
-/***/ "./src/spike.js":
-/*!**********************!*\
-  !*** ./src/spike.js ***!
-  \**********************/
+/***/ "./src/js/spike.js":
+/*!*************************!*\
+  !*** ./src/js/spike.js ***!
+  \*************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1188,7 +1158,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+var _utils = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1241,10 +1211,10 @@ exports.default = Spike;
 
 /***/ }),
 
-/***/ "./src/star.js":
-/*!*********************!*\
-  !*** ./src/star.js ***!
-  \*********************/
+/***/ "./src/js/star.js":
+/*!************************!*\
+  !*** ./src/js/star.js ***!
+  \************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1257,7 +1227,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+var _utils = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1320,10 +1290,10 @@ exports.default = Star;
 
 /***/ }),
 
-/***/ "./src/utils.js":
-/*!**********************!*\
-  !*** ./src/utils.js ***!
-  \**********************/
+/***/ "./src/js/utils.js":
+/*!*************************!*\
+  !*** ./src/js/utils.js ***!
+  \*************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1350,6 +1320,36 @@ function scale(elem, canvas) {
 }
 
 module.exports = { randomIntFromRange: randomIntFromRange, randomColor: randomColor, distance: distance, scale: scale };
+
+/***/ }),
+
+/***/ "./src/scss/index.scss":
+/*!*****************************!*\
+  !*** ./src/scss/index.scss ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/lib/loader.js!./index.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/lib/loader.js!./src/scss/index.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
 
 /***/ })
 

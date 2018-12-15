@@ -3,7 +3,7 @@ import Fragment from "./fragment";
 import Spike from "./spike";
 import Player from "./player";
 import Star from "./star";
-import "./index.scss";
+import "../scss/index.scss";
 
 const loader = document.getElementById("loader");
 const gameArea = document.getElementById("gameArea");
