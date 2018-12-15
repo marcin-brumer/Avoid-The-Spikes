@@ -7,24 +7,47 @@ import "./index.scss";
 
 const gameArea = document.getElementById("gameArea");
 const canvas = document.getElementById("gameCanvas");
+const startMenu = document.getElementById("start_menu");
+const startBtn = document.getElementById("start_btn");
+const gameOverMenu = document.getElementById("game_over_menu");
+const playAgainBtn = document.getElementById("play_again_btn");
+const scoreDisplay = document.getElementById("score_display");
 const ctx = canvas.getContext("2d");
 const groundHeight = 100;
 const sprite = new Image();
 sprite.src = "./img/sprite.png";
 
-let spikes = [];
-let fragments = [];
-let stars = [];
-let timer = 0;
-let score = 0;
+let spikes;
+let fragments;
+let stars;
+let timer;
+let score;
 let spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
 let starRandomSpawnRate = utils.randomIntFromRange(120, 180);
+let runAnim = false; //Check if animation should run
+let player; // Player instance
 
 // Event Listeners
 window.addEventListener("load", resizeGame, false);
 window.addEventListener("resize", resizeGame, false);
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
+startBtn.addEventListener("click", () => {
+  // Enable controls
+  document.addEventListener("keydown", keyDownHandler, false);
+  document.addEventListener("keyup", keyUpHandler, false);
+  // Hide menu
+  startMenu.style.display = "none";
+  // Initialize game
+  init();
+});
+playAgainBtn.addEventListener("click", () => {
+  // Enable controls
+  document.addEventListener("keydown", keyDownHandler, false);
+  document.addEventListener("keyup", keyUpHandler, false);
+  // Hide menu
+  gameOverMenu.style.display = "none";
+  // Initialize game
+  init();
+});
 
 // Scale canvas to fit window (16:9 ratio)
 function resizeGame() {
@@ -81,130 +104,148 @@ function drawScore() {
   );
 }
 
-// Player create
-const player = new Player(sprite, canvas, ctx, groundHeight);
+// Initialize/Reset game
+function init() {
+  player = new Player(sprite, canvas, ctx, groundHeight);
+  spikes = [];
+  fragments = [];
+  stars = [];
+  timer = 0;
+  score = 0;
+  runAnim = true;
+  animate();
+}
 
 // Animation Loop
 function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (runAnim) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Ground
-  ctx.fillStyle = "#0D0909";
-  ctx.fillRect(
-    0,
-    canvas.height - utils.scale(groundHeight, canvas),
-    canvas.width,
-    utils.scale(groundHeight, canvas)
-  );
+    // Ground
+    ctx.fillStyle = "#0D0909";
+    ctx.fillRect(
+      0,
+      canvas.height - utils.scale(groundHeight, canvas),
+      canvas.width,
+      utils.scale(groundHeight, canvas)
+    );
 
-  // Spikes animation
-  spikes.forEach((spike, index) => {
-    spike.update();
-    // Collision Spike-Ground
-    if (
-      spike.y + spike.height >=
-      canvas.height - utils.scale(groundHeight, canvas)
-    ) {
-      // Destroy Spike
-      spikes.splice(index, 1);
-      // Create fragments
-      for (let i = 0; i < 8; i++) {
-        const radius = (Math.random() + 0.5) * 3;
-        fragments.push(
-          new Fragment(
-            spike.x,
-            spike.y + spike.height - utils.scale(radius, canvas),
-            radius,
-            canvas,
-            ctx,
-            groundHeight
-          )
-        );
+    // Spikes animation
+    spikes.forEach((spike, index) => {
+      spike.update();
+      // Collision Spike-Ground
+      if (
+        spike.y + spike.height >=
+        canvas.height - utils.scale(groundHeight, canvas)
+      ) {
+        // Destroy Spike
+        spikes.splice(index, 1);
+        // Create fragments
+        for (let i = 0; i < 8; i++) {
+          const radius = (Math.random() + 0.5) * 3;
+          fragments.push(
+            new Fragment(
+              spike.x,
+              spike.y + spike.height - utils.scale(radius, canvas),
+              radius,
+              canvas,
+              ctx,
+              groundHeight
+            )
+          );
+        }
       }
-    }
-    // Collision Spike-Player
-    if (
-      spike.x < player.x + player.scaledFrameWidth &&
-      spike.x + spike.width > player.x &&
-      spike.y < player.y + player.scaledFrameHeight &&
-      spike.height + spike.y > player.y
-    ) {
-      // Destroy Spike
-      spikes.splice(index, 1);
-      // Create fragments
-      for (let i = 0; i < 8; i++) {
-        const radius = (Math.random() + 0.5) * 3;
-        fragments.push(
-          new Fragment(
-            spike.x,
-            spike.y + spike.height - utils.scale(radius, canvas),
-            radius,
-            canvas,
-            ctx,
-            groundHeight
-          )
-        );
+      // Collision Spike-Player
+      if (
+        spike.x < player.x + player.scaledFrameWidth &&
+        spike.x + spike.width > player.x &&
+        spike.y < player.y + player.scaledFrameHeight &&
+        spike.height + spike.y > player.y
+      ) {
+        // Destroy Spike
+        spikes.splice(index, 1);
+        // Create fragments
+        for (let i = 0; i < 8; i++) {
+          const radius = (Math.random() + 0.5) * 3;
+          fragments.push(
+            new Fragment(
+              spike.x,
+              spike.y + spike.height - utils.scale(radius, canvas),
+              radius,
+              canvas,
+              ctx,
+              groundHeight
+            )
+          );
+        }
+        // Player death
+        player.state = {
+          runningLeft: false,
+          runningRight: false,
+          idleLeft: false,
+          idleRight: false,
+          dead: true
+        };
+        // Disable controls
+        document.removeEventListener("keydown", keyDownHandler, false);
+        document.removeEventListener("keyup", keyUpHandler, false);
+        // Stops animation and shows game over screen after 500ms
+        setTimeout(() => {
+          runAnim = false;
+          gameOverMenu.style.display = "block";
+          scoreDisplay.innerText = `Score: ${score}`;
+        }, 500);
       }
-      // Player death
-      player.state = {
-        runningLeft: false,
-        runningRight: false,
-        idleLeft: false,
-        idleRight: false,
-        dead: true
-      };
-    }
-  });
+    });
 
-  // Stars animation
-  stars.forEach((star, index) => {
-    star.update();
-    // Collision Star-Ground
-    if (star.timeToLive <= 1) {
-      // Destroy Star
-      stars.splice(index, 1);
-    }
-    // Collision Star-Player
-    if (
-      star.x - star.radius < player.x + player.scaledFrameWidth &&
-      star.x + star.radius > player.x &&
-      star.y - star.radius < player.y + player.scaledFrameHeight &&
-      star.y + star.radius > player.y
-    ) {
-      // Destroy Star
-      stars.splice(index, 1);
-      // Update score
-      score++;
-    }
-  });
+    // Stars animation
+    stars.forEach((star, index) => {
+      star.update();
+      // Collision Star-Ground
+      if (star.timeToLive <= 1) {
+        // Destroy Star
+        stars.splice(index, 1);
+      }
+      // Collision Star-Player
+      if (
+        star.x - star.radius < player.x + player.scaledFrameWidth &&
+        star.x + star.radius > player.x &&
+        star.y - star.radius < player.y + player.scaledFrameHeight &&
+        star.y + star.radius > player.y
+      ) {
+        // Destroy Star
+        stars.splice(index, 1);
+        // Update score
+        score++;
+      }
+    });
 
-  // Fragments animation
-  fragments.forEach((fragment, index) => {
-    fragment.update();
-    if (fragment.timeToLive <= 0) {
-      fragments.splice(index, 1);
+    // Fragments animation
+    fragments.forEach((fragment, index) => {
+      fragment.update();
+      if (fragment.timeToLive <= 0) {
+        fragments.splice(index, 1);
+      }
+    });
+
+    // Player animation
+    player.update();
+
+    timer++;
+    // Spawn Spikes
+    if (timer % spikeRandomSpawnRate === 0) {
+      spikes.push(new Spike(canvas, ctx));
+      spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
     }
-  });
+    // Spawn Stars
+    if (timer % starRandomSpawnRate === 0) {
+      stars.push(new Star(canvas, ctx, groundHeight));
+      starRandomSpawnRate = utils.randomIntFromRange(140, 280);
+    }
 
-  // Player animation
-  player.update();
+    // Display Score
+    drawScore();
 
-  timer++;
-  // Spawn Spikes
-  if (timer % spikeRandomSpawnRate === 0) {
-    spikes.push(new Spike(canvas, ctx));
-    spikeRandomSpawnRate = utils.randomIntFromRange(20, 40);
+    requestAnimationFrame(animate);
   }
-  // Spawn Stars
-  if (timer % starRandomSpawnRate === 0) {
-    stars.push(new Star(canvas, ctx, groundHeight));
-    starRandomSpawnRate = utils.randomIntFromRange(140, 280);
-  }
-
-  // Display Score
-  drawScore();
-
-  requestAnimationFrame(animate);
 }
-
-animate();

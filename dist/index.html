@@ -6,12 +6,17 @@
   </head>
   <body>
     <div id="gameArea">
-      <div id="start_menu">
+      <div id="start_menu" class="menu">
         <h1>Avoid The Spikes</h1>
         <p>Use keyboard arrows &#8592 &#8594 to move</p>
-        <button id="start_btn">PLAY</button>
+        <button id="start_btn" class="button">PLAY</button>
       </div>
       <canvas id="gameCanvas"></canvas>
+      <div id="game_over_menu" class="menu">
+        <h1>Game Over</h1>
+        <p id='score_display'></p>
+        <button id="play_again_btn" class="button">PLAY AGAIN</button>
+      </div>
     </div>
   <script type="text/javascript" src="./js/game.bundle.js"></script></body>
 </html>

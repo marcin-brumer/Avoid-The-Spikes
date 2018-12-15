@@ -95,7 +95,7 @@
 
 exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
-exports.push([module.i, "body {\n  margin: 0;\n  overflow: hidden;\n  background-color: #111; }\n  body #gameArea {\n    position: absolute;\n    left: 50%;\n    top: 50%; }\n    body #gameArea #gameCanvas {\n      width: 100%;\n      height: 100%;\n      background-image: url(\"https://raw.githubusercontent.com/marcin-brumer/Avoid-The-Spikes/master/dist/img/background.jpg\");\n      background-size: 100% 100%; }\n    body #gameArea #start_menu {\n      background-color: #000;\n      position: absolute;\n      left: 30%;\n      top: 25%;\n      width: 40%;\n      height: 50%;\n      border-radius: 10%;\n      border: 1vh solid #fff;\n      opacity: 0.8;\n      text-align: center;\n      color: #fff; }\n      body #gameArea #start_menu h1 {\n        font-size: 7vh; }\n      body #gameArea #start_menu p {\n        font-size: 4vh; }\n      body #gameArea #start_menu #start_btn {\n        position: absolute;\n        left: 50%;\n        top: 70%;\n        transform: translate(-50%, -50%);\n        padding: 1vh 4vh;\n        font-size: 2.5vh;\n        border-radius: 1vh;\n        text-decoration: none;\n        outline: none;\n        color: #fff;\n        background-color: #3498db;\n        border: none;\n        border-bottom: 0.6vh solid #2980b9;\n        cursor: pointer; }\n        body #gameArea #start_menu #start_btn:active {\n          transform: translate(-50%, -52%);\n          border-bottom: none; }\n", ""]);
+exports.push([module.i, "body {\n  margin: 0;\n  overflow: hidden;\n  background-color: #111; }\n  body #gameArea {\n    position: absolute;\n    left: 50%;\n    top: 50%; }\n    body #gameArea #gameCanvas {\n      width: 100%;\n      height: 100%;\n      background-image: url(\"https://raw.githubusercontent.com/marcin-brumer/Avoid-The-Spikes/master/dist/img/background.jpg\");\n      background-size: 100% 100%; }\n    body #gameArea .menu {\n      background-color: #000;\n      position: absolute;\n      left: 30%;\n      top: 25%;\n      width: 40%;\n      height: 50%;\n      border-radius: 10%;\n      border: 1vh solid #fff;\n      opacity: 0.8;\n      text-align: center;\n      color: #fff; }\n      body #gameArea .menu h1 {\n        font-size: 7vh; }\n      body #gameArea .menu p {\n        font-size: 4vh; }\n      body #gameArea .menu .button {\n        position: absolute;\n        left: 50%;\n        top: 70%;\n        transform: translate(-50%, -50%);\n        padding: 1vh 4vh;\n        font-size: 2.5vh;\n        border-radius: 1vh;\n        text-decoration: none;\n        outline: none;\n        color: #fff;\n        background-color: #3498db;\n        border: none;\n        border-bottom: 0.6vh solid #2980b9;\n        cursor: pointer; }\n        body #gameArea .menu .button:active {\n          transform: translate(-50%, -45%);\n          border-bottom: none; }\n    body #gameArea #game_over_menu {\n      display: none; }\n", ""]);
 
 
 
@@ -818,24 +818,47 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var gameArea = document.getElementById("gameArea");
 var canvas = document.getElementById("gameCanvas");
+var startMenu = document.getElementById("start_menu");
+var startBtn = document.getElementById("start_btn");
+var gameOverMenu = document.getElementById("game_over_menu");
+var playAgainBtn = document.getElementById("play_again_btn");
+var scoreDisplay = document.getElementById("score_display");
 var ctx = canvas.getContext("2d");
 var groundHeight = 100;
 var sprite = new Image();
 sprite.src = "./img/sprite.png";
 
-var spikes = [];
-var fragments = [];
-var stars = [];
-var timer = 0;
-var score = 0;
+var spikes = void 0;
+var fragments = void 0;
+var stars = void 0;
+var timer = void 0;
+var score = void 0;
 var spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
 var starRandomSpawnRate = _utils2.default.randomIntFromRange(120, 180);
+var runAnim = false; //Check if animation should run
+var player = void 0; // Player instance
 
 // Event Listeners
 window.addEventListener("load", resizeGame, false);
 window.addEventListener("resize", resizeGame, false);
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
+startBtn.addEventListener("click", function () {
+  // Enable controls
+  document.addEventListener("keydown", keyDownHandler, false);
+  document.addEventListener("keyup", keyUpHandler, false);
+  // Hide menu
+  startMenu.style.display = "none";
+  // Initialize game
+  init();
+});
+playAgainBtn.addEventListener("click", function () {
+  // Enable controls
+  document.addEventListener("keydown", keyDownHandler, false);
+  document.addEventListener("keyup", keyUpHandler, false);
+  // Hide menu
+  gameOverMenu.style.display = "none";
+  // Initialize game
+  init();
+});
 
 // Scale canvas to fit window (16:9 ratio)
 function resizeGame() {
@@ -888,97 +911,115 @@ function drawScore() {
   ctx.fillText("Score: " + score, 8, canvas.height - 0.35 * _utils2.default.scale(groundHeight, canvas));
 }
 
-// Player create
-var player = new _player2.default(sprite, canvas, ctx, groundHeight);
+// Initialize/Reset game
+function init() {
+  player = new _player2.default(sprite, canvas, ctx, groundHeight);
+  spikes = [];
+  fragments = [];
+  stars = [];
+  timer = 0;
+  score = 0;
+  runAnim = true;
+  animate();
+}
 
 // Animation Loop
 function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (runAnim) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Ground
-  ctx.fillStyle = "#0D0909";
-  ctx.fillRect(0, canvas.height - _utils2.default.scale(groundHeight, canvas), canvas.width, _utils2.default.scale(groundHeight, canvas));
+    // Ground
+    ctx.fillStyle = "#0D0909";
+    ctx.fillRect(0, canvas.height - _utils2.default.scale(groundHeight, canvas), canvas.width, _utils2.default.scale(groundHeight, canvas));
 
-  // Spikes animation
-  spikes.forEach(function (spike, index) {
-    spike.update();
-    // Collision Spike-Ground
-    if (spike.y + spike.height >= canvas.height - _utils2.default.scale(groundHeight, canvas)) {
-      // Destroy Spike
-      spikes.splice(index, 1);
-      // Create fragments
-      for (var i = 0; i < 8; i++) {
-        var radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _utils2.default.scale(radius, canvas), radius, canvas, ctx, groundHeight));
+    // Spikes animation
+    spikes.forEach(function (spike, index) {
+      spike.update();
+      // Collision Spike-Ground
+      if (spike.y + spike.height >= canvas.height - _utils2.default.scale(groundHeight, canvas)) {
+        // Destroy Spike
+        spikes.splice(index, 1);
+        // Create fragments
+        for (var i = 0; i < 8; i++) {
+          var radius = (Math.random() + 0.5) * 3;
+          fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _utils2.default.scale(radius, canvas), radius, canvas, ctx, groundHeight));
+        }
       }
-    }
-    // Collision Spike-Player
-    if (spike.x < player.x + player.scaledFrameWidth && spike.x + spike.width > player.x && spike.y < player.y + player.scaledFrameHeight && spike.height + spike.y > player.y) {
-      // Destroy Spike
-      spikes.splice(index, 1);
-      // Create fragments
-      for (var _i = 0; _i < 8; _i++) {
-        var _radius = (Math.random() + 0.5) * 3;
-        fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _utils2.default.scale(_radius, canvas), _radius, canvas, ctx, groundHeight));
+      // Collision Spike-Player
+      if (spike.x < player.x + player.scaledFrameWidth && spike.x + spike.width > player.x && spike.y < player.y + player.scaledFrameHeight && spike.height + spike.y > player.y) {
+        // Destroy Spike
+        spikes.splice(index, 1);
+        // Create fragments
+        for (var _i = 0; _i < 8; _i++) {
+          var _radius = (Math.random() + 0.5) * 3;
+          fragments.push(new _fragment2.default(spike.x, spike.y + spike.height - _utils2.default.scale(_radius, canvas), _radius, canvas, ctx, groundHeight));
+        }
+        // Player death
+        player.state = {
+          runningLeft: false,
+          runningRight: false,
+          idleLeft: false,
+          idleRight: false,
+          dead: true
+        };
+        // Disable controls
+        document.removeEventListener("keydown", keyDownHandler, false);
+        document.removeEventListener("keyup", keyUpHandler, false);
+        // Stops animation and shows game over screen after 500ms
+        setTimeout(function () {
+          runAnim = false;
+          gameOverMenu.style.display = "block";
+          scoreDisplay.innerText = "Score: " + score;
+        }, 500);
       }
-      // Player death
-      player.state = {
-        runningLeft: false,
-        runningRight: false,
-        idleLeft: false,
-        idleRight: false,
-        dead: true
-      };
-    }
-  });
+    });
 
-  // Stars animation
-  stars.forEach(function (star, index) {
-    star.update();
-    // Collision Star-Ground
-    if (star.timeToLive <= 1) {
-      // Destroy Star
-      stars.splice(index, 1);
-    }
-    // Collision Star-Player
-    if (star.x - star.radius < player.x + player.scaledFrameWidth && star.x + star.radius > player.x && star.y - star.radius < player.y + player.scaledFrameHeight && star.y + star.radius > player.y) {
-      // Destroy Star
-      stars.splice(index, 1);
-      // Update score
-      score++;
-    }
-  });
+    // Stars animation
+    stars.forEach(function (star, index) {
+      star.update();
+      // Collision Star-Ground
+      if (star.timeToLive <= 1) {
+        // Destroy Star
+        stars.splice(index, 1);
+      }
+      // Collision Star-Player
+      if (star.x - star.radius < player.x + player.scaledFrameWidth && star.x + star.radius > player.x && star.y - star.radius < player.y + player.scaledFrameHeight && star.y + star.radius > player.y) {
+        // Destroy Star
+        stars.splice(index, 1);
+        // Update score
+        score++;
+      }
+    });
 
-  // Fragments animation
-  fragments.forEach(function (fragment, index) {
-    fragment.update();
-    if (fragment.timeToLive <= 0) {
-      fragments.splice(index, 1);
+    // Fragments animation
+    fragments.forEach(function (fragment, index) {
+      fragment.update();
+      if (fragment.timeToLive <= 0) {
+        fragments.splice(index, 1);
+      }
+    });
+
+    // Player animation
+    player.update();
+
+    timer++;
+    // Spawn Spikes
+    if (timer % spikeRandomSpawnRate === 0) {
+      spikes.push(new _spike2.default(canvas, ctx));
+      spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
     }
-  });
+    // Spawn Stars
+    if (timer % starRandomSpawnRate === 0) {
+      stars.push(new _star2.default(canvas, ctx, groundHeight));
+      starRandomSpawnRate = _utils2.default.randomIntFromRange(140, 280);
+    }
 
-  // Player animation
-  player.update();
+    // Display Score
+    drawScore();
 
-  timer++;
-  // Spawn Spikes
-  if (timer % spikeRandomSpawnRate === 0) {
-    spikes.push(new _spike2.default(canvas, ctx));
-    spikeRandomSpawnRate = _utils2.default.randomIntFromRange(20, 40);
+    requestAnimationFrame(animate);
   }
-  // Spawn Stars
-  if (timer % starRandomSpawnRate === 0) {
-    stars.push(new _star2.default(canvas, ctx, groundHeight));
-    starRandomSpawnRate = _utils2.default.randomIntFromRange(140, 280);
-  }
-
-  // Display Score
-  drawScore();
-
-  requestAnimationFrame(animate);
 }
-
-animate();
 
 /***/ }),
 
