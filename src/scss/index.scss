@@ -84,11 +84,11 @@ body {
       color: #fff;
 
       h1 {
-        font-size: 7vh;
+        font-size: 6vh;
       }
 
       p {
-        font-size: 4vh;
+        font-size: 3vh;
       }
 
       .button {
@@ -116,6 +116,28 @@ body {
 
     #game_over_menu {
       display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  body {
+    #gameArea {
+      .menu {
+        border: 0.7vw solid #fff;
+        h1 {
+          font-size: 4vw;
+        }
+        p {
+          font-size: 2vw;
+        }
+        .button {
+          padding: 0.7vw 3vw;
+          font-size: 2vw;
+          border-radius: 0.7vw;
+          border-bottom: 0.4vw solid #2980b9;
+        }
+      }
     }
   }
 }

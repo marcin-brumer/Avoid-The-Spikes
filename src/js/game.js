@@ -42,6 +42,7 @@ window.addEventListener(
   false
 );
 window.addEventListener("resize", resizeGame, false);
+window.addEventListener("orientationchange", resizeGame, false);
 startBtn.addEventListener("click", () => {
   // Enable controls
   document.addEventListener("keydown", keyDownHandler, false);
