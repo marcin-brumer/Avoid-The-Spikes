@@ -12,6 +12,7 @@ const startMenu = document.getElementById("start_menu");
 const startBtn = document.getElementById("start_btn");
 const gameOverMenu = document.getElementById("game_over_menu");
 const playAgainBtn = document.getElementById("play_again_btn");
+const fullscreenBtn = document.getElementById("fullscreenBtn");
 const scoreDisplay = document.getElementById("score_display");
 const ctx = canvas.getContext("2d");
 const groundHeight = 100;
@@ -61,6 +62,38 @@ playAgainBtn.addEventListener("click", () => {
   // Initialize game
   init();
 });
+fullscreenBtn.addEventListener("click", toggleFullScreen);
+
+function toggleFullScreen() {
+  var doc = window.document;
+  var docEl = doc.documentElement;
+
+  var requestFullScreen =
+    docEl.requestFullscreen ||
+    docEl.mozRequestFullScreen ||
+    docEl.webkitRequestFullScreen ||
+    docEl.msRequestFullscreen;
+  var cancelFullScreen =
+    doc.exitFullscreen ||
+    doc.mozCancelFullScreen ||
+    doc.webkitExitFullscreen ||
+    doc.msExitFullscreen;
+
+  if (
+    !doc.fullscreenElement &&
+    !doc.mozFullScreenElement &&
+    !doc.webkitFullscreenElement &&
+    !doc.msFullscreenElement
+  ) {
+    requestFullScreen.call(docEl);
+    fullscreenBtn.classList.remove("fullscreen_disable");
+    fullscreenBtn.classList.add("fullscreen_enable");
+  } else {
+    cancelFullScreen.call(doc);
+    fullscreenBtn.classList.remove("fullscreen_enable");
+    fullscreenBtn.classList.add("fullscreen_disable");
+  }
+}
 
 // Scale canvas to fit window (16:9 ratio)
 function resizeGame() {
