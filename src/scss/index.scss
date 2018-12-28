@@ -142,6 +142,10 @@ body {
     #gameArea {
       .menu {
         border: 0.7vw solid #fff;
+        width: 60%;
+        height: 70%;
+        left: 20%;
+        top: 15%;
         h1 {
           font-size: 4vw;
         }
@@ -153,6 +157,7 @@ body {
           font-size: 2vw;
           border-radius: 0.7vw;
           border-bottom: 0.4vw solid #2980b9;
+          top: 80%;
         }
       }
     }
