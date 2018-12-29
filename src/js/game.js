@@ -48,6 +48,8 @@ startBtn.addEventListener("click", () => {
   // Enable controls
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
+  document.addEventListener("touchstart", touchStartHandler, false);
+  document.addEventListener("touchend", touchEndtHandler, false);
   // Hide menu
   startMenu.style.display = "none";
   // Initialize game
@@ -57,6 +59,8 @@ playAgainBtn.addEventListener("click", () => {
   // Enable controls
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
+  document.addEventListener("touchstart", touchStartHandler, false);
+  document.addEventListener("touchend", touchEndtHandler, false);
   // Hide menu
   gameOverMenu.style.display = "none";
   // Initialize game
@@ -64,16 +68,17 @@ playAgainBtn.addEventListener("click", () => {
 });
 fullscreenBtn.addEventListener("click", toggleFullScreen);
 
+// Toggle fullscreen at button click
 function toggleFullScreen() {
-  var doc = window.document;
-  var docEl = doc.documentElement;
+  const doc = window.document;
+  const docEl = doc.documentElement;
 
-  var requestFullScreen =
+  let requestFullScreen =
     docEl.requestFullscreen ||
     docEl.mozRequestFullScreen ||
     docEl.webkitRequestFullScreen ||
     docEl.msRequestFullscreen;
-  var cancelFullScreen =
+  let cancelFullScreen =
     doc.exitFullscreen ||
     doc.mozCancelFullScreen ||
     doc.webkitExitFullscreen ||
@@ -133,6 +138,24 @@ function keyUpHandler(e) {
     player.state.idleRight = true;
     player.state.idleLeft = false;
   } else if (e.keyCode == 37) {
+    player.state.runningLeft = false;
+    player.state.idleRight = false;
+    player.state.idleLeft = true;
+  }
+}
+function touchStartHandler(e) {
+  if (e.touches[0].pageX > innerWidth / 2) {
+    player.state.runningRight = true;
+  } else {
+    player.state.runningLeft = true;
+  }
+}
+function touchEndtHandler(e) {
+  if (e.changedTouches[0].pageX > innerWidth / 2) {
+    player.state.runningRight = false;
+    player.state.idleRight = true;
+    player.state.idleLeft = false;
+  } else {
     player.state.runningLeft = false;
     player.state.idleRight = false;
     player.state.idleLeft = true;
@@ -235,6 +258,8 @@ function animate() {
         // Disable controls
         document.removeEventListener("keydown", keyDownHandler, false);
         document.removeEventListener("keyup", keyUpHandler, false);
+        document.removeEventListener("touchstart", touchStartHandler, false);
+        document.removeEventListener("touchend", touchEndtHandler, false);
         // Stops animation and shows game over screen after 500ms
         setTimeout(() => {
           runAnim = false;
